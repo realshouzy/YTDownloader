@@ -20,6 +20,7 @@ def download_dir_popup():
 
 sg.theme('Darkred1')
 
+
 # --------- defining layouts
 start_layout = [
     [sg.Input(key='-LINKINPUT-'), sg.Button('Submit')],

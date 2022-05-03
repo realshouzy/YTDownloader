@@ -2,3 +2,4 @@
 /TODO.md
 scripts/__pycache__/
 __pycache__/
+*.pyc

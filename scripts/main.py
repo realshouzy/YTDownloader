@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+# -*- coding: UTF-8 -*-
 import PySimpleGUI as sg
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError

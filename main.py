@@ -72,14 +72,14 @@ while True:
             else:
                 video_object.streams.get_audio_only().download(values['-FOLDER-'])
 
-    except RegexMatchError as err:
+    except RegexMatchError as rmx:
         if not values['-LINKINPUT-']:
-            sg.Popup(f'Error: {type(err).__name__}', custom_text='Please provide link', title='Error')
+            sg.Popup(f'Error: {type(rmx).__name__}', custom_text='Please provide link', title='Error')
         else:
-            sg.Popup(f'Error: {type(err).__name__}', custom_text='Invalid link', title='Error')
+            sg.Popup(f'Error: {type(rmx).__name__}', custom_text='Invalid link', title='Error')
 
-    except Exception as err:
-        sg.Popup(f'{type(err).__name__} at line {err.__traceback__.tb_lineno} of {__file__}: {err}', custom_text='Unexpected error', title='Error') 
+    except Exception as x:
+        sg.Popup(f'{type(x).__name__} at line {x.__traceback__.tb_lineno} of {__file__}: {x}', custom_text='Unexpected error', title='Error') 
         break
 
 main_window.close()

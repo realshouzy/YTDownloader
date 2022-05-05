@@ -1,4 +1,4 @@
 *.exe
-/TODO.md
 *.pyc
-__pycache__/
+*.py[cod]
+/TODO.md

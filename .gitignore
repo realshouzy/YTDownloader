@@ -1,4 +1,4 @@
-/YTDownloader.exe
+*.exe
 /TODO.md
 /scripts/__pycache__/
 __pycache__/

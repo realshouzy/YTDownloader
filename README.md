@@ -7,7 +7,7 @@ I took the freedom to added some features, such as adding a clickable link, sele
 <br />
 You can find the orignial code [here].
 <br />
-WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!
+**WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!**
 
 
 ### Tutorial

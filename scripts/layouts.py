@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import PySimpleGUI as sg
 
 sg.theme('Darkred1')

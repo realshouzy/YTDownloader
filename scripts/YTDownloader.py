@@ -20,7 +20,7 @@ def main() -> None:
         try:
             event, values = start_window.read()
             if event == sg.WIN_CLOSED:
-                break     
+                break
 
             if event == 'Submit':
                 download_window = VideoDownloadWindow(values['-LINKINPUT-'])

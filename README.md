@@ -32,35 +32,43 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 
 ## Tutorial
 ### Video
-1. Step: Copy and paste the link into the input field
-![step1](/tutorial/Video/step1.png)
+1. Step: 
+	- Copy and paste the link into the input field
+	![video_step1](/assets/Video/step1.png)
 
 <br />
 
-2. Step: Press "submit" amd wait for a new window to pop up. This windows has two taps. The first one contains information about the video.
-![step2](/tutorial/Video/step2.png)
+2. Step: 
+	- Press "submit" amd wait for a new window to pop up. 
+	- This windows has two taps. The first one contains information about the video.
+	![video_step2](/assets/Video/step2.png)
 
 <br />
 
-3. Step: Click the "download" tap. This tap contains the download options.
-![step3](/tutorial/Video/step3.png)
+3. Step: 
+	- Click the "download" tap. This tap contains the download options.
+	![video_step3](/assets/Video/step3.png)
 
 <br />
 
-4. Step: Click "browse" or directly type in the directory you want the vidoe to be saved in.
-![step4](/tutorial/Video/step4.png)
+4. Step: 
+	- Click "browse" or directly type in the directory you want the vidoe to be saved in.
+	![video_step4](/assets/Video/step4.png)
 
 <br />
 
-5. Step: Now decide which download option you want and click the "Download" button. You can see the download progress in the progress bar below.
-![step5](/tutorial/Video/step5.png)
+5. Step: 
+	- Now decide which download option you want and click the "Download" button. 
+	- You can see the download progress in the progress bar below.
+	![video_step5](/assets/Video/step5.png)
 
 <br />
 
 6. Step: When the download has finished, a window will pop up to notify you.
-![step6](/tutorial/Video/step6.png)
+	![video_step6](/assets/Video/step6.png)
 
-7. Step: Enjoy the video!
+7. Step: 
+	- Enjoy the video!
 
 
 <br />
@@ -68,35 +76,46 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 
 
 ### Playlist
-1. Step: Copy and paste the link into the input field
-![step1](/tutorial/playlist/step1.png)
+1. Step: 
+	- Copy and paste the link into the input field
+	![playlist_step1](/assets/playlist/step1.png)
 
 <br />
 
-2. Step: Press "submit" amd wait for a new window to pop up (this can take some time, since pytube is not the fastest). This windows has two taps. The first one contains information about the playlist.
-![step2](/tutorial/playlist/step2.png)
+2. Step: 
+	- Press "submit" amd wait for a new window to pop up (this can take some time, since pytube is not the fastest). 
+	- This window has two taps. The first one contains information about the playlist.
+	![playlist_step2](/assets/playlist/step2.png)
 
 <br />
 
-3. Step: Click the "download" tap. This tap contains the download options.
-![step3](/tutorial/playlist/step3.png)
+3. Step: 
+	- Click the "download" tap. This tap contains the download options.
+	![playlist_step3](/assets/playlist/step3.png)
 
 <br />
 
-4. Step: Click "browse" or directly type in the directory you want the vidoe to be saved in.
-![step4](/tutorial/playlist/step4.png)
+4. Step: 
+	- Click "browse" or directly type in the directory you want the vidoe to be saved in.
+	![playlist_step4](/assets/playlist/step4.png)
 
 <br />
 
-5. Step: Now decide which download option you want and click the "Download" button. You can see the download progress in the progress bar below.
-![step5](/tutorial/playlist/step5.png)
+5. Step: 
+	- Now decide which download option you want and click the "Download" button. 
+	- You can see the download progress in the progress bar below.
+	![playlist_step5](/assets/playlist/step5.png)
 
 <br />
 
-6. Step: When the download has finished, a window will pop up to notify you.
-![step6](/tutorial/playlist/step6.png)
+6. Step: 
+	- When the download has finished, a window will pop up to notify you.
+	![playlist_step6](/assets/playlist/step6.png)
 
-7. Step: A new folder with the name of the playlist will be created in the directory you submited. The video will be in that folder. Enjoy the videos!
+7. Step: 
+	- A new folder with the name of the playlist will be created in the directory you submited. 
+	- The video will be in that folder. 
+	- Enjoy the videos!
 
 
 [Clear Code]: https://www.youtube.com/channel/UCznj32AM2r98hZfTxrRo9bQ

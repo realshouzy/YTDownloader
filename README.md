@@ -65,7 +65,7 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 <br />
 
 6. Step: 
-	- When the download has finished, a window will pop up to notify you.
+	- When the download has finished, a window will pop up to notify you. <br />
 	![video_step6](/assets/Video/step6.png)
 
 7. Step: 
@@ -110,7 +110,7 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 <br />
 
 6. Step: 
-	- When the download has finished, a window will pop up to notify you.
+	- When the download has finished, a window will pop up to notify you. <br />
 	![playlist_step6](/assets/Playlist/step6.png)
 
 7. Step: 

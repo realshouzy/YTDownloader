@@ -1,7 +1,7 @@
 <h1 align = 'center'>
 	YTDownloader
 	<br />
-	A program to download any YouTube video
+	A program to download any YouTube video or playlist
 </h1>
 
 <div align = 'center'>

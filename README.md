@@ -34,6 +34,7 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 ### Video
 1. Step: 
 	- Copy and paste the link into the input field
+	- It will automatically detected that it is a YouTube video
 	![video_step1](/assets/Video/step1.png)
 
 <br />
@@ -79,6 +80,7 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 ### Playlist
 1. Step: 
 	- Copy and paste the link into the input field
+	- It will automatically detected that it is a YouTube playlist
 	![playlist_step1](/assets/Playlist/step1.png)
 
 <br />

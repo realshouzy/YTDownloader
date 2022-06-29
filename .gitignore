@@ -2,7 +2,6 @@ __pycache__/
 test/
 .idea/
 .vs/
-tutorial/
 Versions/
 *.exe
 *.pyc

@@ -5,7 +5,7 @@ Versions/
 *.exe
 *.pyc
 *.py[cod]
-*.png
 *.ico
 *.txt
 /TODO.md
+/YTDownloaderIcon.png

@@ -2,7 +2,12 @@ __pycache__/
 test/
 .idea/
 .vs/
+tutorial/
+Versions/
 *.exe
 *.pyc
 *.py[cod]
+*.png
+*.ico
+*.txt
 /TODO.md

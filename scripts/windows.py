@@ -16,19 +16,31 @@ class DownloadWindow:
         self.DOWNLOAD_DIR_POPUP = lambda: sg.Popup('Please select a download directory', title='Info')
         
         # -------------------- defining download options
-        self.LD = '360p'
-        self.HD = '720p'
-        self.AUDIO = 'audio'
+        self.LD = ('360p', 'video', True, None)
+        self.HD = ('720p', 'video', True, None)
+        self.AUDIO = (None, 'audio', False, '128kbps')
 
     @property
     def URL(self) -> str:
         return self.__URL
 
+    def remove_forbidden_characters(self, text: str) -> str:
+        """
+        Helper method that removes '\\', '/', ':', '*', '?', '<', '>', '|' from a string.
+    
+        :param str text: string
+        :return str: string with removed forbidden characters
+        """
+        forbidden_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+        for character in forbidden_characters:
+            text = text.replace(character, '')
+        return text
+
 
 
 class PlaylistDownloadWindow(DownloadWindow):
     """
-    Class that contains and creates the Window and necessary methods to download a YouTube playlist.
+    Class that contains and creates the window and necessary methods to download a YouTube playlist.
     """
     def __init__(self, url: str) -> None:
         DownloadWindow.__init__(self, url)
@@ -46,8 +58,8 @@ class PlaylistDownloadWindow(DownloadWindow):
 
         download_all_tab = [
             [sg.Text('Download Folder'), sg.Input(size=(53, 1), enable_events=True, key='-FOLDER-'), sg.FolderBrowse()],
-            [sg.Frame('Highest resolution', [[sg.Button('Download All', key='-HD-'), sg.Text(self.HD), sg.Text(f'{self.calculate_size(self.HD)} MB')]])],
-            [sg.Frame('Lowest resolution', [[sg.Button('Download All', key='-LD-'), sg.Text(self.LD), sg.Text(f'{self.calculate_size(self.LD)} MB')]])],
+            [sg.Frame('Highest resolution', [[sg.Button('Download All', key='-HD-'), sg.Text(self.HD[0]), sg.Text(f'{self.calculate_size(self.HD)} MB')]])],
+            [sg.Frame('Lowest resolution', [[sg.Button('Download All', key='-LD-'), sg.Text(self.LD[0]), sg.Text(f'{self.calculate_size(self.LD)} MB')]])],
             [sg.Frame('Audio only', [[sg.Button('Download All', key='-AUDIOALL-'), sg.Text(f'{self.calculate_size(self.AUDIO)} MB')]])],
             [sg.VPush()],
             [sg.Text('', key='-COMPLETED-', size=(57, 1), justification='c', font='underline')],
@@ -69,20 +81,17 @@ class PlaylistDownloadWindow(DownloadWindow):
 
         :param str option: 
         """
+        resolution, file_type, progressiv, abr = option
         playlist_size = 0
-        if option == 'audio':
-            for video_obj in self.playlist_obj.videos:
-                    playlist_size += video_obj.streams.get_audio_only().filesize
-        else:
-            for video_obj in self.playlist_obj.videos:
-                    playlist_size += video_obj.streams.get_by_resolution(option).filesize
+        for video_obj in self.playlist_obj.videos:
+                playlist_size += video_obj.streams.filter(resolution=resolution, type=file_type, progressive=progressiv, abr=abr).first().filesize
             
         return round(playlist_size / 1048576, 1)
 
     
     def create(self) -> None:
         """
-        Method that creates the event loop for the Window.
+        Method that creates the event loop for the window.
         """
         # -------------------- download event loop
         while True:
@@ -113,31 +122,22 @@ class PlaylistDownloadWindow(DownloadWindow):
         """
         Helper Method that downloads the the videos of the playlist.
 
-        :param Any option: Download option, either 720p, 360p or audio
+        :param tuple option: tyuple containing the download options
         """
         if not self.values['-FOLDER-']:
             self.DOWNLOAD_DIR_POPUP()
             return
         
-        download_dir = self.rename_download_folder(self.values["-FOLDER-"], self.playlist_obj.title)
+        resolution, file_type, progressiv, abr = option
+        download_dir = self.rename_download_folder(self.values["-FOLDER-"], self.remove_forbidden_characters(self.playlist_obj.title))
 
-        if option == 'audio':
-            download_counter = 0
-            for video_obj in self.playlist_obj.videos:
-                video_obj.streams.get_audio_only().download(download_dir)
-                download_counter += 1
-                self.download_window['-DOWNLOADPROGRESS-'].update(download_counter)
-                self.download_window['-COMPLETED-'].update(f'{download_counter} of {self.playlist_obj.length}')
-            self.download_complete()
-
-        else:
-            download_counter = 0
-            for video_obj in self.playlist_obj.videos:
-                video_obj.streams.get_by_resolution(option).download(download_dir)
-                download_counter += 1
-                self.download_window['-DOWNLOADPROGRESS-'].update(download_counter)
-                self.download_window['-COMPLETED-'].update(f'{download_counter} of {self.playlist_obj.length}')
-            self.download_complete()
+        download_counter = 0
+        for video_obj in self.playlist_obj.videos:
+            video_obj.streams.filter(resolution=resolution, type=file_type, progressive=progressiv, abr=abr).first().download(output_path=download_dir, filename=f'{self.remove_forbidden_characters(video_obj.title)}.mp4')
+            download_counter += 1
+            self.download_window['-DOWNLOADPROGRESS-'].update(download_counter)
+            self.download_window['-COMPLETED-'].update(f'{download_counter} of {self.playlist_obj.length}')
+        self.download_complete()
 
 
     def download_complete(self) -> None:
@@ -175,7 +175,7 @@ class PlaylistDownloadWindow(DownloadWindow):
 
 class VideoDownloadWindow(DownloadWindow):
     """
-    Class that contains and creates the Window and necessary methods to download a YouTube video.
+    Class that contains and creates the window and necessary methods to download a YouTube video.
     """
     def __init__(self, url: str) -> None:
         DownloadWindow.__init__(self, url)
@@ -194,9 +194,9 @@ class VideoDownloadWindow(DownloadWindow):
 
         download_tab = [
             [sg.Text('Download Folder'), sg.Input(size=(27, 1), enable_events=True, key='-FOLDER-'), sg.FolderBrowse()],
-            [sg.Frame('Highest resolution', [[sg.Button('Download', key='-HD-'), sg.Text(self.HD), sg.Text(f'{round(self.video_obj.streams.get_by_resolution(self.HD).filesize / 1048576,1)} MB')]])],
-            [sg.Frame('Lowest resolution', [[sg.Button('Download', key='-LD-'), sg.Text(self.LD), sg.Text(f'{round(self.video_obj.streams.get_by_resolution(self.LD).filesize / 1048576,1)} MB')]])],
-            [sg.Frame('Audio only', [[sg.Button('Download', key='-AUDIO-'), sg.Text(f'{round(self.video_obj.streams.get_audio_only().filesize / 1048576,1)} MB')]])],
+            [sg.Frame('Highest resolution', [[sg.Button('Download', key='-HD-'), sg.Text(self.HD[0]), sg.Text(f'{round(self.video_obj.streams.get_by_resolution(self.HD[0]).filesize / 1048576,1)} MB')]])],
+            [sg.Frame('Lowest resolution', [[sg.Button('Download', key='-LD-'), sg.Text(self.LD[0]), sg.Text(f'{round(self.video_obj.streams.get_by_resolution(self.LD[0]).filesize / 1048576,1)} MB')]])],
+            [sg.Frame('Audio only', [[sg.Button('Download', key='-AUDIO-'), sg.Text(f'{round(self.video_obj.streams.filter(type=self.AUDIO[1], abr=self.AUDIO[3]).first().filesize / 1048576,1)} MB')]])],
             [sg.VPush()],
             [sg.Text('', key='-COMPLETED-', size=(40, 1), justification='c', font='underline')],
             [sg.Progress(100, orientation='h', size=(20, 20), key='-DOWNLOADPROGRESS-', expand_x=True, bar_color='Black')]
@@ -213,7 +213,7 @@ class VideoDownloadWindow(DownloadWindow):
 
     def create(self) -> None:
         """
-        Method that creates the event loop for the Window.
+        Method that creates the event loop for the window.
         """
         # -------------------- download event loop
         while True:
@@ -238,21 +238,20 @@ class VideoDownloadWindow(DownloadWindow):
         self.download_window.close()
 
 
-    def download_file(self, option: Any) -> None:
+    def download_file(self, option: tuple[str|None, str, bool, str|None]) -> None:
         """
         Helper method that downloads the video in the given directory.
 
-        :param Any option: Download option, either 720p, 360p or audio
+        :param tuple option: tyuple containing the download options
         """
         self.folder = self.values['-FOLDER-']
+        resolution, file_type, progressiv, abr = option
         if not self.folder:
             self.DOWNLOAD_DIR_POPUP()
             return
         
-        if option == 'audio':
-            self.video_obj.streams.get_audio_only().download(output_path=self.folder, filename=f'{self.rename_downloaded_file(self.video_obj.title)}.mp4')
-        else:
-            self.video_obj.streams.get_by_resolution(option).download(output_path=self.folder, filename=f'{self.rename_downloaded_file(self.video_obj.title)}.mp4')
+        video = self.video_obj.streams.filter(resolution=resolution, type=file_type, progressive=progressiv, abr=abr).first()
+        video.download(output_path=self.folder, filename=f'{self.rename_downloaded_file(self.video_obj.title)}.mp4')
 
     
     def rename_downloaded_file(self, file_name: str) -> str:
@@ -262,6 +261,7 @@ class VideoDownloadWindow(DownloadWindow):
         :param str file_name: video title
         :return str file_name|new_file_name: either original file name or new, incremented file name
         """
+        file_name = self.remove_forbidden_characters(file_name)
         if Path(f'{self.folder}/{file_name}.mp4').exists():
             i = 1
             while True:

@@ -17,7 +17,7 @@ def validate_url(url: str) -> PlaylistDownloadWindow|VideoDownloadWindow:
     """
     db = {
         r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})': PlaylistDownloadWindow,
-        r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([0-9A-Za-z_-]{11})': VideoDownloadWindow
+        r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})': VideoDownloadWindow
     }
 
     for k, v in db.items():

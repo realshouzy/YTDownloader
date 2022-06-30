@@ -111,7 +111,6 @@ class PlaylistDownloadWindow(DownloadWindow):
             if self.event == '-LD-':
                 self.download(self.LD)
 
-
             if self.event == '-AUDIOALL-':
                 self.download(self.AUDIO)
 
@@ -291,6 +290,3 @@ class VideoDownloadWindow(DownloadWindow):
         self.download_window['-DOWNLOADPROGRESS-'].update(0)
         self.download_window['-COMPLETED-'].update('')
         sg.Popup('Download completed')
-        
-
-

@@ -11,7 +11,6 @@ import re
 from downloader import VideoDownloader, PlaylistDownloader, ErrorWindow
 
 
-sg.set_global_icon('C:/Users/yanni/Desktop/Code/YTDownloader/ytdownloader.ico')
 sg.theme('Darkred1')
 
 

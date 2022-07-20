@@ -1,4 +1,11 @@
 <h1 align = 'center'>
+	<img 
+        src = 'assets/ytdownloader.png' 
+        height = '100' 
+        width = '100' 
+        alt = 'Icon' 
+    />
+    <br>
 	YTDownloader
 	<br />
 	A program to download any YouTube video or playlist

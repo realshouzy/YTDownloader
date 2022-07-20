@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
+"""
+Main module
+"""
 import PySimpleGUI as sg
+import pytube.exceptions
+
 import re
-from pytube.exceptions import RegexMatchError, VideoUnavailable, AgeRestrictedError, VideoPrivate, MembersOnly, VideoRegionBlocked
-from windows import VideoDownloadWindow, PlaylistDownloadWindow
+
+from downloader import VideoDownloader, PlaylistDownloader, ErrorWindow
 
 
+sg.set_global_icon('C:/Users/yanni/Desktop/Code/YTDownloader/ytdownloader.ico')
 sg.theme('Darkred1')
 
 
-def validate_url(url: str) -> PlaylistDownloadWindow|VideoDownloadWindow:
+def get_valid_downloader(url: str) -> PlaylistDownloader|VideoDownloader:
     """
-    Helper function that validates wether the given url is a vaild YouTube Playlist or Video link.
+    Helper function that validates wether the given url is a vaild YouTube Playlist or Video link and returns the appropriate downloader.
 
     :param str url: YouTube url
+    :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
     """
-    db = {
-        r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})': PlaylistDownloadWindow,
-        r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})': VideoDownloadWindow
+    youtube_playlist_pattern = r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})'
+    youtube_video_pattern = r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})'
+
+    youtube_patterns: dict[str, PlaylistDownloader|VideoDownloader] = {
+        youtube_playlist_pattern: PlaylistDownloader,
+        youtube_video_pattern: VideoDownloader
     }
 
-    for k, v in db.items():
-        if re.search(k, url):
-            return v(url)
-    raise RegexMatchError(validate_url, db)
+    for pattern, downloader in youtube_patterns.items():
+        if re.search(pattern, url):
+            return downloader(url)
+
+    raise pytube.exceptions.RegexMatchError(get_valid_downloader, youtube_patterns)
 
 
 
@@ -45,33 +56,32 @@ def main() -> None:
                 break
 
             if event == 'Submit':
-                download_window = validate_url(values['-LINKINPUT-'])
-                if download_window is not None:
-                    download_window.create()
+                youtube_downloader = get_valid_downloader(values['-LINKINPUT-'])
+                youtube_downloader.create_window()
 
-        except RegexMatchError as rmx:
+        except pytube.exceptions.RegexMatchError as rmx:
             if not values['-LINKINPUT-']:
-                sg.Popup(f'Error: {type(rmx).__name__}', custom_text='Please provide link', title='Error')
+                ErrorWindow(rmx, 'Please provide link.').create()
             else:
-                sg.Popup(f'Error: {type(rmx).__name__}', custom_text='Invalid link', title='Error')
+                ErrorWindow(rmx, 'Invalid link.').create()
 
-        except AgeRestrictedError as arx:
-            sg.Popup(f'Error: {type(arx).__name__}', custom_text='Video age restriced', title='Error')
+        except pytube.exceptions.AgeRestrictedError as arx:
+            ErrorWindow(arx, 'Video age restriced.').create()
 
-        except VideoPrivate as vpx:
-            sg.Popup(f'Error: {type(vpx).__name__}', custom_text='Video is privat', title='Error')
+        except pytube.exceptions.VideoPrivate as vpx:
+            ErrorWindow(vpx, 'Video is privat.').create()
 
-        except MembersOnly as mox:
-            sg.Popup(f'Error: {type(mox).__name__}', custom_text='Video is for members only', title='Error')
+        except pytube.exceptions.MembersOnly as mox:
+            ErrorWindow(mox, 'Video is for members only.').create()
 
-        except VideoRegionBlocked as vgbx:
-            sg.Popup(f'Error: {type(vgbx).__name__}', custom_text='Video is block in your region', title='Error')
+        except pytube.exceptions.VideoRegionBlocked as vgbx:
+            ErrorWindow(vgbx, 'Video is block in your region.').create()
 
-        except VideoUnavailable as vux:
-            sg.Popup(f'Error: {type(vux).__name__}', custom_text='Video Unavailable', title='Error')
+        except pytube.exceptions.VideoUnavailable as vux:
+            ErrorWindow(vux, 'Video Unavailable.').create()
 
         except Exception as x:
-            sg.Popup(f'{type(x).__name__} at line {x.__traceback__.tb_lineno} of {__file__}: {x}', custom_text='Unexpected error', title='Error') 
+            ErrorWindow(x, 'Unexpected error\n'f'{type(x).__name__} at line {x.__traceback__.tb_lineno} of {__file__}: {x}').create()
             break
 
     start_window.close()

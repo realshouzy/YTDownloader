@@ -1,11 +1,12 @@
 __pycache__/
 .idea/
 .vs/
+.mypy_cache/
 Versions/
 *.exe
-*.pyc
 *.py[cod]
 *.ico
+*.png
 *.txt
 /TODO.md
 /YTDownloaderIcon.png

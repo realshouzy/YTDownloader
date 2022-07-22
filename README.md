@@ -36,7 +36,7 @@ The icon can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUW
 ## Download
 You can find the realeses [here](https://github.com/realshouzy/YTDownloader/releases)
 - For Windows just download the executable
-- For Linux or macOS download the source code and in the scripts folder run the main.py (requires Python)
+- For Linux or macOS download the source code, install the requirements via pip and in the scripts folder run the main.py (requires Python 3.10 or newer)
 
 <br />
 

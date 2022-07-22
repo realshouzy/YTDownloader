@@ -3,6 +3,9 @@ __pycache__/
 .vs/
 .mypy_cache/
 Versions/
+build/
+dist/
+*.spec
 *.exe
 *.py[cod]
 *.ico

@@ -12,10 +12,11 @@
 </h1>
 
 <div align = 'center'>
-	<a href = 'https://github.com/realshouzy/YTDownloader/releases'>
-	        <img src = 'https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release'/>
-	 </a>
-	 
+
+[![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
+[![Code Size](https://img.shields.io/github/languages/code-size/realshouzy/YTDownloader)](https://github.com/realshouzy/YTDownloader)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 </div>
 
 <br />

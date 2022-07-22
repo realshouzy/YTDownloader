@@ -2,6 +2,7 @@
 """
 Module containing all classes to download YouTube content.
 """
+from __future__ import annotations
 import PySimpleGUI as sg
 from pytube import YouTube, Playlist
 import webbrowser
@@ -45,7 +46,7 @@ class YouTubeDownloader(ABC):
 
     def remove_forbidden_characters(self, text: str) -> str:
         """
-        Helper method that removes '\\', '/', ':', '*', '?', '<', '>', '|' from a string.
+        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string.
     
         :param str text: string
         :return str: string with removed forbidden characters
@@ -86,7 +87,7 @@ class PlaylistDownloader(YouTubeDownloader):
             [sg.Text('URL:'), sg.Text(self.URL, enable_events=True, key='-URL-')],
             [sg.Text('Title:'), sg.Text(self.playlist.title)],
             [sg.Text('Videos:'), sg.Text(self.playlist.length)],
-            [sg.Text('Views:'), sg.Text(self.playlist.views)],
+            [sg.Text('Views:'), sg.Text(f'{self.playlist.views:,}')],
             [sg.Text('Owner:'), sg.Text(self.playlist.owner, enable_events=True, key='-OWNER-')],
             [sg.Text('Last updated:'), sg.Text(self.playlist.last_updated)]
         ]
@@ -217,7 +218,7 @@ class VideoDownloader(YouTubeDownloader):
             [sg.Text('URL:'), sg.Text(self.URL, enable_events=True, key='-URL-')],
             [sg.Text('Title:'), sg.Text(self.video.title)],
             [sg.Text('Length:'), sg.Text(f'{round(self.video.length / 60,2)} minutes')],
-            [sg.Text('Views:'), sg.Text(self.video.views)],
+            [sg.Text('Views:'), sg.Text(f'{self.video.views:,}')],
             [sg.Text('Creator:'), sg.Text(self.video.author)],
             [sg.Text('Thumbnail:'), sg.Text(self.video.thumbnail_url, enable_events=True, key='-THUMB-')],
             [sg.Text('Description:'), sg.Multiline(self.video.description, size = (40, 20), no_scrollbar=True, disabled=True)]

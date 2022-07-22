@@ -3,6 +3,7 @@
 """
 Main module
 """
+from __future__ import annotations
 import PySimpleGUI as sg
 import pytube.exceptions
 
@@ -21,10 +22,10 @@ def get_valid_downloader(url: str) -> PlaylistDownloader|VideoDownloader:
     :param str url: YouTube url
     :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
     """
-    youtube_playlist_pattern = r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})'
-    youtube_video_pattern = r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})'
+    youtube_playlist_pattern: re.Pattern[str] = re.compile(r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})')
+    youtube_video_pattern: re.Pattern[str] = re.compile(r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})')
 
-    youtube_patterns: dict[str, PlaylistDownloader|VideoDownloader] = {
+    youtube_patterns: dict[re.Pattern[str], PlaylistDownloader|VideoDownloader] = {
         youtube_playlist_pattern: PlaylistDownloader,
         youtube_video_pattern: VideoDownloader
     }

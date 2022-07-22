@@ -9,6 +9,5 @@ dist/
 *.exe
 *.py[cod]
 *.ico
-*.txt
 /TODO.md
 /YTDownloaderIcon.png

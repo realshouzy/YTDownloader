@@ -23,7 +23,7 @@
 
 ## Disclaimer
 This concept is **not** my idea. I was inspired by **[Clear Code]** from this **[Video]**.
-I took the freedom to added some features, such as downloading playlists, selecting a download directory and other adjustments.
+I took the freedom to add some features, such as downloading playlists, selecting a download directory and other adjustments.
 <br />
 You can find the orignial code [here](https://pastebin.com/gRtcAv5c).
 <br />

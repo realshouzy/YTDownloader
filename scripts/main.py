@@ -4,6 +4,7 @@
 Main module
 """
 from __future__ import annotations
+
 import PySimpleGUI as sg
 import pytube.exceptions
 
@@ -15,7 +16,7 @@ from downloader import VideoDownloader, PlaylistDownloader, ErrorWindow
 sg.theme('Darkred1')
 
 
-def get_valid_downloader(url: str) -> PlaylistDownloader|VideoDownloader:
+def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     """
     Helper function that validates wether the given url is a vaild YouTube Playlist or Video link and returns the appropriate downloader.
 
@@ -25,16 +26,12 @@ def get_valid_downloader(url: str) -> PlaylistDownloader|VideoDownloader:
     youtube_playlist_pattern: re.Pattern[str] = re.compile(r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})')
     youtube_video_pattern: re.Pattern[str] = re.compile(r'^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|shorts\/)?)([0-9A-Za-z_-]{11})')
 
-    youtube_patterns: dict[re.Pattern[str], PlaylistDownloader|VideoDownloader] = {
-        youtube_playlist_pattern: PlaylistDownloader,
-        youtube_video_pattern: VideoDownloader
-    }
-
-    for pattern, downloader in youtube_patterns.items():
-        if re.search(pattern, url):
-            return downloader(url)
-
-    raise pytube.exceptions.RegexMatchError(get_valid_downloader, youtube_patterns)
+    if re.search(youtube_video_pattern, url):
+        return VideoDownloader(url)
+    elif re.search(youtube_playlist_pattern, url):
+        return PlaylistDownloader(url)
+    else:
+        raise pytube.exceptions.RegexMatchError(get_valid_downloader, youtube_video_pattern | youtube_playlist_pattern)
 
 
 

@@ -1,6 +1,6 @@
 <h1 align = 'center'>
 	<img 
-        src = 'assets/ytdownloader.png' 
+        src = 'assets/YTdownloader.png' 
         height = '100' 
         width = '100' 
         alt = 'Icon' 

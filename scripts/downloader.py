@@ -3,12 +3,12 @@
 Module containing all classes to download YouTube content.
 """
 from __future__ import annotations
+from pathlib import Path
+from typing import Any
+
 import PySimpleGUI as sg
 from pytube import YouTube, Playlist
 import webbrowser
-
-from pathlib import Path
-from typing import Any
 
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
@@ -20,10 +20,10 @@ class DownloadOption:
     """
     Class that defines and contains the download options and represents them as a tuple.
     """
-    RESOLUTION: str|None
+    RESOLUTION: str | None
     TYPE: str
     PROGRESSIVE: bool
-    ABR: str|None
+    ABR: str | None
 
     def __str__(self) -> str:
         return str((self.RESOLUTION, self.TYPE, self.PROGRESSIVE, self.ABR))
@@ -79,6 +79,11 @@ class PlaylistDownloader(YouTubeDownloader):
     Class that contains and creates the window and necessary methods to download a YouTube playlist.
     """
     def __init__(self, url: str) -> None:
+        """
+        Initializes PlaylistDownloader instance.
+
+        :param str url: YouTube playlist url
+        """
         YouTubeDownloader.__init__(self, url)
         self.playlist = Playlist(self.URL)
 
@@ -188,7 +193,7 @@ class PlaylistDownloader(YouTubeDownloader):
         :param Path root: Path in which the playlist folder will be created 
         :param Path destination: Folder in which the playlist will be downloaded
 
-        :return Path original_path|new_path: Either the original path or if already downloaded renamed incremented path
+        :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
         """
         original_path = Path(f'{root}/{destination}')
         if original_path.exists():
@@ -210,6 +215,11 @@ class VideoDownloader(YouTubeDownloader):
     Class that contains and creates the window and necessary methods to download a YouTube video.
     """
     def __init__(self, url: str) -> None:
+        """
+        Initializes VideoDownloader instance.
+
+        :param str url: YouTube video url
+        """
         YouTubeDownloader.__init__(self, url)
         self.video = YouTube(self.URL, on_progress_callback=self.__progress_check, on_complete_callback=self.__on_complete)
 
@@ -284,7 +294,7 @@ class VideoDownloader(YouTubeDownloader):
         Helper method that renames the the file if the user download the video more than once.
 
         :param str file_name: video title
-        :return str file_name|new_file_name: either original file name or new, incremented file name
+        :return str file_name | new_file_name: either original file name or new, incremented file name
         """
         file_name = self.remove_forbidden_characters(file_name)
         if Path(f'{self.folder}/{file_name}.mp4').exists():
@@ -308,7 +318,7 @@ class VideoDownloader(YouTubeDownloader):
         self.download_window['-COMPLETED-'].update(f'{100 - round(bytes_remaining / stream.filesize * 100)}% completed')
 
 
-    def __on_complete(self, stream: Any, file_path: str|None) -> None:
+    def __on_complete(self, stream: Any, file_path: str | None) -> None:
         """
         Helper method that resets the progress bar when the video download has finished.
         Parameters are necessary.

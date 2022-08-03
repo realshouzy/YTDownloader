@@ -229,7 +229,7 @@ class VideoDownloader(YouTubeDownloader):
             [sg.Text('Title:'), sg.Text(self.video.title)],
             [sg.Text('Length:'), sg.Text(f'{round(self.video.length / 60,2)} minutes')],
             [sg.Text('Views:'), sg.Text(f'{self.video.views:,}')],
-            [sg.Text('Creator:'), sg.Text(self.video.author)],
+            [sg.Text('Creator:'), sg.Text(self.video.author, enable_events=True, key='-CREATOR-')],
             [sg.Text('Thumbnail:'), sg.Text(self.video.thumbnail_url, enable_events=True, key='-THUMB-')],
             [sg.Text('Description:'), sg.Multiline(self.video.description, size = (40, 20), no_scrollbar=True, disabled=True)]
         ]
@@ -262,6 +262,9 @@ class VideoDownloader(YouTubeDownloader):
 
             if self.event == '-URL-':
                 webbrowser.open(self.URL)
+
+            if self.event == '-CREATOR-':
+                webbrowser.open(self.video.channel_url)
             
             if self.event == '-THUMB-':
                 webbrowser.open(self.video.thumbnail_url)
@@ -335,7 +338,7 @@ class ErrorWindow:
     """
     def __init__(self, error_name: Exception, error_message: str) -> None:
         self.ERROR: Exception = error_name
-        self.ERROR_MESSAGE = error_message
+        self.ERROR_MESSAGE: str = error_message
 
         self.error_layout = [
             [sg.Text(f'{type(self.ERROR).__name__}: {self.ERROR_MESSAGE}')],

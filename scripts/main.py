@@ -31,7 +31,7 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     elif re.search(youtube_playlist_pattern, url):
         return PlaylistDownloader(url)
     else:
-        raise pytube.exceptions.RegexMatchError(get_valid_downloader, youtube_video_pattern | youtube_playlist_pattern)
+        raise pytube.exceptions.RegexMatchError(get_valid_downloader, (youtube_video_pattern, youtube_playlist_pattern))
 
 
 
@@ -76,6 +76,9 @@ def main() -> None:
 
         except pytube.exceptions.VideoUnavailable as vux:
             ErrorWindow(vux, 'Video Unavailable.').create()
+
+        except KeyError as kx:
+            ErrorWindow(kx, 'Video or playlist is unreachable or invalid.').create()
 
         except Exception as x:
             ErrorWindow(x, 'Unexpected error\n'f'{type(x).__name__} at line {x.__traceback__.tb_lineno} of {__file__}: {x}').create()

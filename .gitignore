@@ -10,3 +10,4 @@ dist/
 *.py[cod]
 *.ico
 /TODO.md
+/venv

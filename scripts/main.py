@@ -10,7 +10,8 @@ import pytube.exceptions
 
 import re
 
-from downloader import VideoDownloader, PlaylistDownloader, ErrorWindow
+from utils.downloader import VideoDownloader, PlaylistDownloader
+from utils.error_window import ErrorWindow
 
 
 sg.theme('Darkred1')

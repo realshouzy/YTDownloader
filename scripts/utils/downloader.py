@@ -4,7 +4,7 @@ Module containing all classes to download YouTube content.
 """
 from __future__ import annotations
 from pathlib import Path
-from typing import Any
+from typing import Any, overload
 
 import PySimpleGUI as sg
 from pytube import YouTube, Playlist
@@ -12,7 +12,6 @@ import webbrowser
 
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-
 
 
 @dataclass(frozen=True, order=True)
@@ -24,10 +23,6 @@ class DownloadOption:
     TYPE: str
     PROGRESSIVE: bool
     ABR: str | None
-
-    def __str__(self) -> str:
-        return str((self.RESOLUTION, self.TYPE, self.PROGRESSIVE, self.ABR))
-
 
 
 @dataclass(frozen=True)
@@ -46,15 +41,15 @@ class YouTubeDownloader(ABC):
 
     def remove_forbidden_characters(self, text: str) -> str:
         """
-        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid a OSError.
     
         :param str text: string
         :return str: string with removed forbidden characters
         """
         forbidden_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
         for character in forbidden_characters:
-            text = text.replace(character, '')
-        return text
+            new_text = text.replace(character, '')
+        return new_text
 
   
     @abstractmethod
@@ -72,6 +67,29 @@ class YouTubeDownloader(ABC):
         :param tuple option: tuple containing the download options
         """
 
+    
+    @abstractmethod
+    @overload
+    def rename_download(self, root: Path, destination: Path) -> Path:
+        """
+        Helper method that renames the the folder if the user download the playlist more than once.
+
+        :param Path root: Path in which the playlist folder will be created 
+        :param Path destination: Folder in which the playlist will be downloaded
+
+        :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
+        """
+
+    
+    @abstractmethod
+    @overload
+    def rename_download(self, file_name: str) -> str:
+        """
+        Helper method that renames the the file if the user download the video more than once.
+
+        :param str file_name: video title
+        :return str file_name | new_file_name: either original file name or new, incremented file name
+        """
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -162,7 +180,7 @@ class PlaylistDownloader(YouTubeDownloader):
             self.DOWNLOAD_DIR_POPUP()
             return
 
-        download_dir = self.rename_download_folder(Path(self.values["-FOLDER-"]), Path(self.remove_forbidden_characters(self.playlist.title)))
+        download_dir = self.rename_download(Path(self.values["-FOLDER-"]), Path(self.remove_forbidden_characters(self.playlist.title)))
 
         download_counter = 0
         for video in self.playlist.videos:
@@ -174,10 +192,10 @@ class PlaylistDownloader(YouTubeDownloader):
             download_counter += 1
             self.download_window['-DOWNLOADPROGRESS-'].update(download_counter)
             self.download_window['-COMPLETED-'].update(f'{download_counter} of {self.playlist.length}')
-        self.download_complete()
+        self._download_complete()
 
 
-    def download_complete(self) -> None:
+    def _download_complete(self) -> None:
         """
         Helper method that resets the download progressbar and notifies the user when the download has finished.
         """
@@ -186,15 +204,7 @@ class PlaylistDownloader(YouTubeDownloader):
         sg.Popup('Download completed')
 
     
-    def rename_download_folder(self, root: Path, destination: Path) -> Path:
-        """
-        Helper method that renames the the folder if the user download the playlist more than once.
-
-        :param Path root: Path in which the playlist folder will be created 
-        :param Path destination: Folder in which the playlist will be downloaded
-
-        :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
-        """
+    def rename_download(self, root: Path, destination: Path) -> Path:
         original_path = Path(f'{root}/{destination}')
         if original_path.exists():
             i = 1
@@ -289,16 +299,10 @@ class VideoDownloader(YouTubeDownloader):
         (
          self.video.streams.filter(resolution=download_option.RESOLUTION, type=download_option.TYPE, progressive=download_option.PROGRESSIVE, abr=download_option.ABR)
             .first()
-            .download(output_path=self.folder, filename=f'{self.rename_downloaded_file(self.video.title)}.mp4')
+            .download(output_path=self.folder, filename=f'{self.rename_downloaded(self.video.title)}.mp4')
         )
     
-    def rename_downloaded_file(self, file_name: str) -> str:
-        """
-        Helper method that renames the the file if the user download the video more than once.
-
-        :param str file_name: video title
-        :return str file_name | new_file_name: either original file name or new, incremented file name
-        """
+    def rename_downloaded(self, file_name: str) -> str:
         file_name = self.remove_forbidden_characters(file_name)
         if Path(f'{self.folder}/{file_name}.mp4').exists():
             i = 1

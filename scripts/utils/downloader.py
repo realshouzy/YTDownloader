@@ -39,7 +39,7 @@ class YouTubeDownloader(ABC):
     AUDIO: DownloadOption = field(default=DownloadOption(None, 'audio', False, '128kbps'), init=False)
 
 
-    def remove_forbidden_characters(self, text: str) -> str:
+    def remove_forbidden_characters(self, file_name: str) -> str:
         """
         Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid a OSError.
     
@@ -48,8 +48,8 @@ class YouTubeDownloader(ABC):
         """
         forbidden_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
         for character in forbidden_characters:
-            new_text = text.replace(character, '')
-        return new_text
+            new_file_name = file_name.replace(character, '')
+        return new_file_name
 
   
     @abstractmethod
@@ -67,9 +67,9 @@ class YouTubeDownloader(ABC):
         :param tuple option: tuple containing the download options
         """
 
-    
-    @abstractmethod
+
     @overload
+    @abstractmethod
     def rename_download(self, root: Path, destination: Path) -> Path:
         """
         Helper method that renames the the folder if the user download the playlist more than once.
@@ -80,9 +80,9 @@ class YouTubeDownloader(ABC):
         :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
         """
 
-    
-    @abstractmethod
+
     @overload
+    @abstractmethod
     def rename_download(self, file_name: str) -> str:
         """
         Helper method that renames the the file if the user download the video more than once.
@@ -90,7 +90,6 @@ class YouTubeDownloader(ABC):
         :param str file_name: video title
         :return str file_name | new_file_name: either original file name or new, incremented file name
         """
-
 
 class PlaylistDownloader(YouTubeDownloader):
     """

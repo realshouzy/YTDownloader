@@ -4,14 +4,15 @@ Module containing all classes to download YouTube content.
 """
 from __future__ import annotations
 from pathlib import Path
-from typing import Any, overload
-
-import PySimpleGUI as sg
-from pytube import YouTube, Playlist
-import webbrowser
+from typing import Any
 
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+
+import webbrowser
+import PySimpleGUI as sg
+from pytube import YouTube, Playlist
+
 
 
 @dataclass(frozen=True, order=True)
@@ -31,7 +32,7 @@ class YouTubeDownloader(ABC):
     Abstract class that defines the most important constants, like the url and contains the download options (qualities) as well as defines needed (abstract) methods.
     """
     URL: str
-    DOWNLOAD_DIR_POPUP: sg.Popup = field(default=lambda self: sg.Popup('Please select a download directory', title='Info'), init=False)
+    DOWNLOAD_DIR_POPUP: Any = field(default=lambda self: sg.Popup('Please select a download directory', title='Info'), init=False)
 
     # -------------------- defining download options
     LD: DownloadOption = field(default=DownloadOption('360p', 'video', True, None), init=False)
@@ -67,29 +68,6 @@ class YouTubeDownloader(ABC):
         :param tuple option: tuple containing the download options
         """
 
-
-    @overload
-    @abstractmethod
-    def rename_download(self, root: Path, destination: Path) -> Path:
-        """
-        Helper method that renames the the folder if the user download the playlist more than once.
-
-        :param Path root: Path in which the playlist folder will be created 
-        :param Path destination: Folder in which the playlist will be downloaded
-
-        :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
-        """
-
-
-    @overload
-    @abstractmethod
-    def rename_download(self, file_name: str) -> str:
-        """
-        Helper method that renames the the file if the user download the video more than once.
-
-        :param str file_name: video title
-        :return str file_name | new_file_name: either original file name or new, incremented file name
-        """
 
 class PlaylistDownloader(YouTubeDownloader):
     """
@@ -131,7 +109,7 @@ class PlaylistDownloader(YouTubeDownloader):
         ]
 
         self.download_window: sg.Window = sg.Window('Youtube Downloader', self.main_layout, modal=True)
-    
+  
 
     def calculate_playlist_size(self, download_option: DownloadOption) -> float:
         """
@@ -142,33 +120,36 @@ class PlaylistDownloader(YouTubeDownloader):
         """
         playlist_size = 0
         for video in self.playlist.videos:
-                playlist_size += (
-                    video.streams.filter(resolution=download_option.RESOLUTION, type=download_option.TYPE, progressive=download_option.PROGRESSIVE, abr=download_option.ABR)
-                     .first().filesize
-                )
+            playlist_size += (
+                video.streams.filter(resolution=download_option.RESOLUTION,
+                                     type=download_option.TYPE,
+                                     progressive=download_option.PROGRESSIVE,
+                                     abr=download_option.ABR)
+                    .first().filesize
+            )
         return round(playlist_size / 1048576, 1)
 
-    
+
     def create_window(self) -> None:
         # -------------------- download window event loop
         while True:
-            self.event, self.values = self.download_window.read()
-            if self.event == sg.WIN_CLOSED:
+            event, self.values = self.download_window.read()
+            if event == sg.WIN_CLOSED:
                 break
-            
-            if self.event == '-URL-':
+
+            if event == '-URL-':
                 webbrowser.open(self.URL)
 
-            if self.event == '-OWNER-':
+            if event == '-OWNER-':
                 webbrowser.open(self.playlist.owner_url)
 
-            if self.event == '-HD-':
+            if event == '-HD-':
                 self.download(self.HD)
 
-            if self.event == '-LD-':
+            if event == '-LD-':
                 self.download(self.LD)
 
-            if self.event == '-AUDIOALL-':
+            if event == '-AUDIOALL-':
                 self.download(self.AUDIO)
 
         self.download_window.close()
@@ -179,7 +160,7 @@ class PlaylistDownloader(YouTubeDownloader):
             self.DOWNLOAD_DIR_POPUP()
             return
 
-        download_dir = self.rename_download(Path(self.values["-FOLDER-"]), Path(self.remove_forbidden_characters(self.playlist.title)))
+        download_dir = self.rename_download_folder(Path(self.values["-FOLDER-"]), Path(self.remove_forbidden_characters(self.playlist.title)))
 
         download_counter = 0
         for video in self.playlist.videos:
@@ -203,7 +184,15 @@ class PlaylistDownloader(YouTubeDownloader):
         sg.Popup('Download completed')
 
     
-    def rename_download(self, root: Path, destination: Path) -> Path:
+    def rename_download_folder(self, root: Path, destination: Path) -> Path:
+        """
+        Helper method that renames the the folder if the user download the playlist more than once.
+
+        :param Path root: Path in which the playlist folder will be created 
+        :param Path destination: Folder in which the playlist will be downloaded
+
+        :return Path original_path | new_path: Either the original path or if already downloaded renamed incremented path
+        """
         original_path = Path(f'{root}/{destination}')
         if original_path.exists():
             i = 1
@@ -216,7 +205,6 @@ class PlaylistDownloader(YouTubeDownloader):
                     return new_path
 
         return original_path
-
 
 
 class VideoDownloader(YouTubeDownloader):
@@ -265,28 +253,28 @@ class VideoDownloader(YouTubeDownloader):
     def create_window(self) -> None:
         # -------------------- download window event loop
         while True:
-            self.event, self.values = self.download_window.read()
-            if self.event == sg.WIN_CLOSED:
-                break
+            event, self.values = self.download_window.read()
+            if event == sg.WIN_CLOSED:
 
-            if self.event == '-URL-':
+                break
+            if event == '-URL-':
                 webbrowser.open(self.URL)
 
-            if self.event == '-CREATOR-':
+            if event == '-CREATOR-':
                 webbrowser.open(self.video.channel_url)
-            
-            if self.event == '-THUMB-':
+
+            if event == '-THUMB-':
                 webbrowser.open(self.video.thumbnail_url)
-                
-            if self.event == '-HD-':
+
+            if event == '-HD-':
                 self.download(self.HD)
 
-            if self.event == '-LD-':
+            if event == '-LD-':
                 self.download(self.LD)
-                
-            if self.event == '-AUDIO-':
+
+            if event == '-AUDIO-':
                 self.download(self.AUDIO)
-                
+
         self.download_window.close()
 
 
@@ -296,12 +284,22 @@ class VideoDownloader(YouTubeDownloader):
             self.DOWNLOAD_DIR_POPUP()
             return
         (
-         self.video.streams.filter(resolution=download_option.RESOLUTION, type=download_option.TYPE, progressive=download_option.PROGRESSIVE, abr=download_option.ABR)
+         self.video.streams.filter(resolution=download_option.RESOLUTION,
+                                   type=download_option.TYPE,
+                                   progressive=download_option.PROGRESSIVE,
+                                   abr=download_option.ABR)
             .first()
-            .download(output_path=self.folder, filename=f'{self.rename_downloaded(self.video.title)}.mp4')
+            .download(output_path=self.folder,
+                      filename=f'{self.rename_video(self.video.title)}.mp4')
         )
-    
-    def rename_downloaded(self, file_name: str) -> str:
+
+    def rename_video(self, file_name: str) -> str:
+        """
+        Helper method that renames the the file if the user download the video more than once.
+
+        :param str file_name: video title
+        :return str file_name | new_file_name: either original file name or new, incremented file name
+        """
         file_name = self.remove_forbidden_characters(file_name)
         if Path(f'{self.folder}/{file_name}.mp4').exists():
             i = 1
@@ -311,7 +309,7 @@ class VideoDownloader(YouTubeDownloader):
 
                 if not Path(f'{self.folder}/{new_file_name}.mp4').exists():
                     return f'{new_file_name}'
-        
+   
         return f'{file_name}'
 
 

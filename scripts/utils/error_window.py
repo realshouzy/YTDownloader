@@ -2,8 +2,8 @@
 """Module containing the class to create a error window."""
 from __future__ import annotations
 
-import PySimpleGUI as sg
 import webbrowser
+import PySimpleGUI as sg
 
 
 class ErrorWindow:
@@ -27,11 +27,11 @@ class ErrorWindow:
         """
         # -------------------- error window event loop
         while True:
-            self.event, self.values = self.error_window.read()
-            if self.event in {sg.WIN_CLOSED, '-OK-'}:
+            event, _ = self.error_window.read()
+            if event in {sg.WIN_CLOSED, '-OK-'}:
                 break
 
-            if self.event == '-REPORT-':
+            if event == '-REPORT-':
                 webbrowser.open('https://github.com/realshouzy/YTDownloader/issues')
 
         self.error_window.close()

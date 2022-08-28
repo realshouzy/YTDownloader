@@ -5,10 +5,9 @@ Main module.
 """
 from __future__ import annotations
 
+import re
 import PySimpleGUI as sg
 import pytube.exceptions
-
-import re
 
 from utils.downloader import VideoDownloader, PlaylistDownloader
 from utils.error_window import ErrorWindow
@@ -32,7 +31,7 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     elif re.search(youtube_playlist_pattern, url):
         return PlaylistDownloader(url)
     else:
-        raise pytube.exceptions.RegexMatchError(get_valid_downloader, (youtube_video_pattern, youtube_playlist_pattern))
+        raise pytube.exceptions.RegexMatchError('get_valid_downloader', 'youtube_video_pattern or youtube_playlist_pattern')
 
 
 
@@ -62,9 +61,6 @@ def main() -> None:
                 ErrorWindow(rmx, 'Please provide link.').create()
             else:
                 ErrorWindow(rmx, 'Invalid link.').create()
-
-        except pytube.exceptions.AgeRestrictedError as arx:
-            ErrorWindow(arx, 'Video age restriced.').create()
 
         except pytube.exceptions.VideoPrivate as vpx:
             ErrorWindow(vpx, 'Video is privat.').create()

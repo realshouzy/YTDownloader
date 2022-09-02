@@ -28,10 +28,9 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
 
     if re.search(youtube_video_pattern, url):
         return VideoDownloader(url)
-    elif re.search(youtube_playlist_pattern, url):
+    if re.search(youtube_playlist_pattern, url):
         return PlaylistDownloader(url)
-    else:
-        raise pytube.exceptions.RegexMatchError('get_valid_downloader', 'youtube_video_pattern or youtube_playlist_pattern')
+    raise pytube.exceptions.RegexMatchError('get_valid_downloader', 'youtube_video_pattern or youtube_playlist_pattern')
 
 
 

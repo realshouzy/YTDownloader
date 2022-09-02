@@ -3,8 +3,8 @@
 Module containing all classes to download YouTube content.
 """
 from __future__ import annotations
+from typing import Any, Optional
 from pathlib import Path
-from typing import Any
 
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
@@ -20,10 +20,10 @@ class DownloadOption:
     """
     Class that defines and contains the download options and represents them as a tuple.
     """
-    RESOLUTION: str | None
+    RESOLUTION: Optional[str]
     TYPE: str
     PROGRESSIVE: bool
-    ABR: str | None
+    ABR: Optional[str]
 
 
 @dataclass(frozen=True)

@@ -40,17 +40,18 @@ class YouTubeDownloader(ABC):
     AUDIO: DownloadOption = field(default=DownloadOption(None, 'audio', False, '128kbps'), init=False)
 
 
-    def remove_forbidden_characters(self, file_name: str) -> str:
+    @staticmethod
+    def remove_forbidden_characters(file_name: str) -> str:
         """
-        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid a OSError.
+        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid an OSError.
     
         :param str text: string
         :return str: string with removed forbidden characters
         """
         forbidden_characters = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
         for character in forbidden_characters:
-            new_file_name = file_name.replace(character, '')
-        return new_file_name
+            file_name = file_name.replace(character, '')
+        return file_name
 
   
     @abstractmethod
@@ -183,8 +184,8 @@ class PlaylistDownloader(YouTubeDownloader):
         self.download_window['-COMPLETED-'].update('')
         sg.Popup('Download completed')
 
-    
-    def rename_download_folder(self, root: Path, destination: Path) -> Path:
+    @staticmethod
+    def rename_download_folder(root: Path, destination: Path) -> Path:
         """
         Helper method that renames the the folder if the user download the playlist more than once.
 
@@ -293,7 +294,8 @@ class VideoDownloader(YouTubeDownloader):
                       filename=f'{self.rename_video(self.video.title)}.mp4')
         )
 
-    def rename_video(self, file_name: str) -> str:
+    @staticmethod
+    def rename_video(file_name: str) -> str:
         """
         Helper method that renames the the file if the user download the video more than once.
 
@@ -322,7 +324,7 @@ class VideoDownloader(YouTubeDownloader):
         self.download_window['-COMPLETED-'].update(f'{100 - round(bytes_remaining / stream.filesize * 100)}% completed')
 
 
-    def __on_complete(self, stream: Any, file_path: str | None) -> None:
+    def __on_complete(self, stream: Any, file_path: Optional[str]) -> None:
         """
         Helper method that resets the progress bar when the video download has finished.
         Parameters are necessary.

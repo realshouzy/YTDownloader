@@ -10,16 +10,19 @@ class ErrorWindow:
     """
     Class that contains and creates an error window.
     """
+
     def __init__(self, error_name: Exception, error_message: str) -> None:
         self.error: Exception = error_name
         self.error_message: str = error_message
 
-        self.error_layout = [
-            [sg.Text(f'{type(self.error).__name__}: {self.error_message}')],
-            [sg.Button('Ok', key='-OK-'), sg.Button('Report', key='-REPORT-')]
+        self.error_layout: list[list[sg.Text | sg.Button]] = [
+            [sg.Text(f"{self.error.__class__.__name__}: {self.error_message}")],
+            [sg.Button("Ok", key="-OK-"), sg.Button("Report", key="-REPORT-")],
         ]
 
-        self.error_window = sg.Window('Error', layout=self.error_layout, modal=True)
+        self.error_window: sg.Window = sg.Window(
+            "Error", layout=self.error_layout, modal=True
+        )
 
     def create(self) -> None:
         """
@@ -27,10 +30,10 @@ class ErrorWindow:
         """
         # -------------------- error window event loop
         while True:
-            event, _ = self.error_window.read()
-            if event in {sg.WIN_CLOSED, '-OK-'}:
+            event, _ = self.error_window.read()  # type: ignore
+            if event in {sg.WIN_CLOSED, "-OK-"}:
                 break
-            if event == '-REPORT-':
-                webbrowser.open('https://github.com/realshouzy/YTDownloader/issues')
+            if event == "-REPORT-":
+                webbrowser.open("https://github.com/realshouzy/YTDownloader/issues")
 
         self.error_window.close()

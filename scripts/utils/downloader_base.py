@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-"""
-Module containing the base class for the YouTube downloader.
-"""
+"""Module containing the base class for the YouTube downloader."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path

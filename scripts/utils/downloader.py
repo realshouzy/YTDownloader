@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-"""
-Module containing all classes to download YouTube content.
-"""
+"""Module containing all classes to download YouTube content."""
 from __future__ import annotations
 from typing import Any, Optional, Callable
 from pathlib import Path

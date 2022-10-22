@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-"""
-Main module.
-"""
+"""Main module."""
 from __future__ import annotations
 
 import re

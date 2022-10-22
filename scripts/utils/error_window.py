@@ -7,9 +7,7 @@ import PySimpleGUI as sg
 
 
 class ErrorWindow:
-    """
-    Class that contains and creates an error window.
-    """
+    """Class that contains and creates an error window."""
 
     def __init__(self, error_name: Exception, error_message: str) -> None:
         self.error: Exception = error_name
@@ -25,9 +23,7 @@ class ErrorWindow:
         )
 
     def create(self) -> None:
-        """
-        Method that creates the event loop for the error window.
-        """
+        """Method that creates the event loop for the error window."""
         # -------------------- error window event loop
         while True:
             event, _ = self.error_window.read()  # type: ignore

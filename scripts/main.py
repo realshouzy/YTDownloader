@@ -17,8 +17,7 @@ sg.theme("Darkred1")
 
 
 def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
-    """
-    Helper function that validates wether the given url is a vaild YouTube Playlist or Video link and returns the appropriate downloader.
+    """Helper function that validates wether the given url is a vaild YouTube Playlist or Video link and returns the appropriate downloader.
 
     :param str url: YouTube url
     :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
@@ -40,9 +39,7 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
 
 
 def main() -> None:
-    """
-    Runs the program.
-    """
+    """Runs the program."""
     # -------------------- defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [
         [sg.Input(key="-LINKINPUT-"), sg.Button("Submit")],

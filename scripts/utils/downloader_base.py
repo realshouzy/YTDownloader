@@ -10,17 +10,14 @@ from .download_option import DownloadOption
 
 
 class YouTubeDownloader(ABC):
-    """
-    Abstract class that defines the most important needed (abstract) methods.
-    """
+    """Abstract class that defines the most important needed (abstract) methods."""
 
     def __init__(self, url: str) -> None:
         self.url: str = url
 
     @staticmethod
     def remove_forbidden_characters(name: str) -> str:
-        """
-        Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid an OSError.
+        """Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid an OSError.
 
         :param str text: string
         :return str: string with removed forbidden characters
@@ -29,8 +26,7 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def rename_dir(root: Path | str, sub: Path | str) -> Path:
-        """
-        Helper method that renames the the folder if the user download the playlist more than once.
+        """Helper method that renames the the folder if the user download the playlist more than once.
 
         :param Path | str root: Path in which the playlist folder will be created
         :param Path | str sub: Folder in which the playlist will be downloaded
@@ -51,8 +47,7 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def rename_file(root: Path | str, file_name: str) -> str:
-        """
-        Helper method that renames the the file if the user download the video more than once.
+        """Helper method that renames the the file if the user download the video more than once.
 
         :param Path | str root: Path in which the file will be downloaded
         :param str file_name: video title
@@ -71,14 +66,11 @@ class YouTubeDownloader(ABC):
 
     @abstractmethod
     def create_window(self) -> None:
-        """
-        Method that creates the event loop for the download window.
-        """
+        """Method that creates the event loop for the download window."""
 
     @abstractmethod
     def download(self, download_option: DownloadOption) -> None:
-        """
-        Helper method that downloads the YouTube content into the given directory.
+        """Helper method that downloads the YouTube content into the given directory.
 
         :param tuple option: tuple containing the download options
         """

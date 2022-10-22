@@ -26,13 +26,10 @@ DOWNLOAD_DIR_POPUP: Callable[[], Any] = lambda: sg.Popup(
 
 
 class PlaylistDownloader(YouTubeDownloader):
-    """
-    Class that contains and creates the window and necessary methods to download a YouTube playlist.
-    """
+    """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
 
     def __init__(self, url: str) -> None:
-        """
-        Initializes PlaylistDownloader instance.
+        """Initializes PlaylistDownloader instance.
 
         :param str url: YouTube playlist url
         """
@@ -133,24 +130,22 @@ class PlaylistDownloader(YouTubeDownloader):
         )
 
     def calculate_playlist_size(self, download_option: DownloadOption) -> float:
-        """
-        Helper method that calculates the file size of a playlist, since pytube does not have this feature.
+        """Helper method that calculates the file size of a playlist, since pytube does not have this feature.
 
         :param DownloadOption option: class containing the download options
         :return float: size of the playlist
         """
-        playlist_size: int = 0
-        for video in self.playlist.videos:
-            playlist_size += (
-                video.streams.filter(
-                    resolution=download_option.RESOLUTION,
-                    type=download_option.TYPE,
-                    progressive=download_option.PROGRESSIVE,
-                    abr=download_option.ABR,
-                )
-                .first()
-                .filesize  # type: ignore
+        playlist_size: int = sum(
+            video.streams.filter(
+                resolution=download_option.RESOLUTION,
+                type=download_option.TYPE,
+                progressive=download_option.PROGRESSIVE,
+                abr=download_option.ABR,
             )
+            .first()
+            .filesize  # type: ignore
+            for video in self.playlist.videos  # type: ignore
+        )
         return round(playlist_size / 1048576, 1)
 
     def create_window(self) -> None:
@@ -215,22 +210,17 @@ class PlaylistDownloader(YouTubeDownloader):
         self.__download_complete()
 
     def __download_complete(self) -> None:
-        """
-        Helper method that resets the download progressbar and notifies the user when the download has finished.
-        """
+        """Helper method that resets the download progressbar and notifies the user when the download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self.download_window["-COMPLETED-"].update("")  # type: ignore
         sg.Popup("Download completed")
 
 
 class VideoDownloader(YouTubeDownloader):
-    """
-    Class that contains and creates the window and necessary methods to download a YouTube video.
-    """
+    """Class that contains and creates the window and necessary methods to download a YouTube video."""
 
     def __init__(self, url: str) -> None:
-        """
-        Initializes VideoDownloader instance.
+        """Initializes VideoDownloader instance.
 
         :param str url: YouTube video url
         """
@@ -401,8 +391,7 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def __progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
-        """
-        Helper method that updated the progress bar when progress in the video download was made.
+        """Helper method that updated the progress bar when progress in the video download was made.
         Parameters are necessary.
         """
         self.download_window["-DOWNLOADPROGRESS-"].update(
@@ -413,8 +402,7 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def __on_complete(self, stream: Any, file_path: Optional[str]) -> None:
-        """
-        Helper method that resets the progress bar when the video download has finished.
+        """Helper method that resets the progress bar when the video download has finished.
         Parameters are necessary.
         """
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore

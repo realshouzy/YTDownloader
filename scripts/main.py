@@ -75,14 +75,16 @@ def main() -> None:
         except pytube.exceptions.VideoUnavailable as vux:
             ErrorWindow(vux, "Video Unavailable.").create()
 
-        except KeyError as kx:
-            ErrorWindow(kx, "Video or playlist is unreachable or invalid.").create()
-
-        except Exception as x:
+        except KeyError as key_exce:
             ErrorWindow(
-                x,
+                key_exce, "Video or playlist is unreachable or invalid."
+            ).create()
+
+        except Exception as exce:
+            ErrorWindow(
+                exce,
                 "Unexpected error\n"
-                f"{x.__class__.__name__} at line {x.__traceback__.tb_lineno} of {__file__}: {x}",  # type: ignore
+                f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
             ).create()
             break
 

@@ -60,7 +60,7 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download All", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
-                            sg.Text(f"{self.calculate_playlist_size(HD)} MB"),
+                            sg.Text(f"{self.get_playlist_size(HD)} MB"),
                         ]
                     ],
                 )
@@ -72,7 +72,7 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download All", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
-                            sg.Text(f"{self.calculate_playlist_size(LD)} MB"),
+                            sg.Text(f"{self.get_playlist_size(LD)} MB"),
                         ]
                     ],
                 )
@@ -83,7 +83,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-AUDIOALL-"),
-                            sg.Text(f"{self.calculate_playlist_size(AUDIO)} MB"),
+                            sg.Text(f"{self.get_playlist_size(AUDIO)} MB"),
                         ]
                     ],
                 )
@@ -127,24 +127,26 @@ class PlaylistDownloader(YouTubeDownloader):
             "Youtube Downloader", self.main_layout, modal=True
         )
 
-    def calculate_playlist_size(self, download_option: DownloadOption) -> float:
+    def get_playlist_size(self, download_option: DownloadOption) -> float:
         """Helper method that calculates the file size of a playlist, since pytube does not have this feature.
 
         :param DownloadOption option: class containing the download options
         :return float: size of the playlist
         """
         playlist_size: int = sum(
-            video.streams.filter(
-                resolution=download_option.RESOLUTION,
-                type=download_option.TYPE,
-                progressive=download_option.PROGRESSIVE,
-                abr=download_option.ABR,
+            (
+                video.streams.filter(
+                    resolution=download_option.RESOLUTION,
+                    type=download_option.TYPE,
+                    progressive=download_option.PROGRESSIVE,
+                    abr=download_option.ABR,
+                )
+                .first()
+                .filesize  # type: ignore
             )
-            .first()
-            .filesize  # type: ignore
-            for video in self.playlist.videos  # type: ignore
+            for video in self.playlist.videos
         )
-        return round(playlist_size / 1048576, 1)
+        return playlist_size
 
     def create_window(self) -> None:
         # -------------------- download window event loop
@@ -388,10 +390,10 @@ class VideoDownloader(YouTubeDownloader):
             )
         )
 
-    def __progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
-        """Helper method that updated the progress bar when progress in the video download was made.
-        Parameters are necessary.
-        """
+    def __progress_check(
+        self, stream: Any, chunk: bytes, bytes_remaining: int
+    ) -> None:  # parameters are necessary
+        """Helper method that updated the progress bar when progress in the video download was made."""
         self.download_window["-DOWNLOADPROGRESS-"].update(
             100 - round(bytes_remaining / stream.filesize * 100)  # type: ignore
         )
@@ -399,10 +401,10 @@ class VideoDownloader(YouTubeDownloader):
             f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed"  # type: ignore
         )
 
-    def __on_complete(self, stream: Any, file_path: Optional[str]) -> None:
-        """Helper method that resets the progress bar when the video download has finished.
-        Parameters are necessary.
-        """
+    def __on_complete(
+        self, stream: Any, file_path: Optional[str]
+    ) -> None:  # parameters are necessary
+        """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self.download_window["-COMPLETED-"].update("")  # type: ignore
         sg.Popup("Download completed")

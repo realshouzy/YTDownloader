@@ -146,7 +146,7 @@ class PlaylistDownloader(YouTubeDownloader):
             )
             for video in self.playlist.videos
         )
-        return playlist_size
+        return round(playlist_size / 1048576, 1)
 
     def create_window(self) -> None:
         # -------------------- download window event loop
@@ -273,7 +273,7 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.video.streams.get_by_resolution(HD.RESOLUTION).filesize / 1048576,1)} MB"  # type: ignore
+                                f"{round(self.video.streams.get_by_resolution(HD.RESOLUTION).filesize / 1048576, 1)} MB"  # type: ignore
                             ),
                         ]
                     ],
@@ -287,7 +287,7 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.video.streams.get_by_resolution(LD.RESOLUTION).filesize / 1048576,1)} MB"  # type: ignore
+                                f"{round(self.video.streams.get_by_resolution(LD.RESOLUTION).filesize / 1048576, 1)} MB"  # type: ignore
                             ),
                         ]
                     ],
@@ -300,7 +300,7 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-AUDIO-"),
                             sg.Text(
-                                f"{round(self.video.streams.filter(type=AUDIO.TYPE, abr=AUDIO.ABR).first().filesize / 1048576,1)} MB"  # type: ignore
+                                f"{round(self.video.streams.filter(type=AUDIO.TYPE, abr=AUDIO.ABR).first().filesize / 1048576, 1)} MB"  # type: ignore
                             ),
                         ]
                     ],

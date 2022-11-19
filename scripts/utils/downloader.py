@@ -225,11 +225,9 @@ class VideoDownloader(YouTubeDownloader):
     __slots__: tuple[str, ...] = (
         "url",
         "video",
-        "hd_video",
-        "ld_video",
-        "audio_video",
         "select_dict",
         "download_window",
+        "folder",
     )
 
     def __init__(self, url: str) -> None:
@@ -244,31 +242,33 @@ class VideoDownloader(YouTubeDownloader):
             on_complete_callback=self.__on_complete,
         )
 
-        self.hd_video: Optional[Stream] = self.video.streams.filter(
+        # -------------------- defining videos
+        hd_video: Optional[Stream] = self.video.streams.filter(
             resolution=HD.RESOLUTION,
             type=HD.TYPE,
             progressive=HD.PROGRESSIVE,
             abr=HD.ABR,
         ).first()
 
-        self.ld_video: Optional[Stream] = self.video.streams.filter(
+        ld_video: Optional[Stream] = self.video.streams.filter(
             resolution=LD.RESOLUTION,
             type=LD.TYPE,
             progressive=LD.PROGRESSIVE,
             abr=LD.ABR,
         ).first()
 
-        self.audio_video: Optional[Stream] = self.video.streams.filter(
+        audio_video: Optional[Stream] = self.video.streams.filter(
             resolution=AUDIO.RESOLUTION,
             type=AUDIO.TYPE,
             progressive=AUDIO.PROGRESSIVE,
             abr=AUDIO.ABR,
         ).first()
 
+        # -------------------- binding videos to corresponding download option
         self.select_dict: dict[DownloadOption, Optional[Stream]] = {
-            HD: self.hd_video,
-            LD: self.ld_video,
-            AUDIO: self.audio_video,
+            HD: hd_video,
+            LD: ld_video,
+            AUDIO: audio_video,
         }
 
         # -------------------- defining layouts
@@ -313,8 +313,8 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.hd_video.filesize/ 1048576, 1)} MB"
-                                if self.hd_video is not None
+                                f"{round(self.select_dict[HD].filesize / 1048576, 1)} MB"  # type: ignore
+                                if self.select_dict[HD] is not None
                                 else "Unavailable"
                             ),
                         ]
@@ -329,8 +329,8 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.ld_video.filesize / 1048576, 1)} MB"
-                                if self.ld_video is not None
+                                f"{round(self.select_dict[LD].filesize / 1048576, 1)} MB"  # type: ignore
+                                if self.select_dict[LD] is not None
                                 else "Unavailable"
                             ),
                         ]
@@ -344,8 +344,8 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-AUDIO-"),
                             sg.Text(
-                                f"{round(self.audio_video.filesize / 1048576, 1)} MB"
-                                if self.audio_video is not None
+                                f"{round(self.select_dict[AUDIO].filesize / 1048576, 1)} MB"  # type: ignore
+                                if self.select_dict[AUDIO] is not None
                                 else "Unavailable"
                             ),
                         ]

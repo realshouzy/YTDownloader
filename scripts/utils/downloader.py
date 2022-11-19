@@ -30,10 +30,6 @@ class PlaylistDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
 
     def __init__(self, url: str) -> None:
-        """Initializes PlaylistDownloader instance.
-
-        :param str url: YouTube playlist url
-        """
         super().__init__(url)
         self.playlist: Playlist = Playlist(self.url)
 
@@ -231,10 +227,6 @@ class VideoDownloader(YouTubeDownloader):
     )
 
     def __init__(self, url: str) -> None:
-        """Initializes VideoDownloader instance.
-
-        :param str url: YouTube video url
-        """
         super().__init__(url)
         self.video: YouTube = YouTube(
             self.url,
@@ -242,33 +234,11 @@ class VideoDownloader(YouTubeDownloader):
             on_complete_callback=self.__on_complete,
         )
 
-        # -------------------- defining videos
-        hd_video: Optional[Stream] = self.video.streams.filter(
-            resolution=HD.RESOLUTION,
-            type=HD.TYPE,
-            progressive=HD.PROGRESSIVE,
-            abr=HD.ABR,
-        ).first()
-
-        ld_video: Optional[Stream] = self.video.streams.filter(
-            resolution=LD.RESOLUTION,
-            type=LD.TYPE,
-            progressive=LD.PROGRESSIVE,
-            abr=LD.ABR,
-        ).first()
-
-        audio_video: Optional[Stream] = self.video.streams.filter(
-            resolution=AUDIO.RESOLUTION,
-            type=AUDIO.TYPE,
-            progressive=AUDIO.PROGRESSIVE,
-            abr=AUDIO.ABR,
-        ).first()
-
         # -------------------- binding videos to corresponding download option
         self.select_dict: dict[DownloadOption, Optional[Stream]] = {
-            HD: hd_video,
-            LD: ld_video,
-            AUDIO: audio_video,
+            HD: self.get_video(HD),
+            LD: self.get_video(LD),
+            AUDIO: self.get_video(AUDIO),
         }
 
         # -------------------- defining layouts
@@ -385,6 +355,15 @@ class VideoDownloader(YouTubeDownloader):
         self.download_window: sg.Window = sg.Window(
             "Youtube Downloader", main_layout, modal=True
         )
+
+    def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
+        """Returns the video to the corresponding download option."""
+        return self.video.streams.filter(
+            resolution=download_option.RESOLUTION,
+            type=download_option.TYPE,
+            progressive=download_option.PROGRESSIVE,
+            abr=download_option.ABR,
+        ).first()
 
     def create_window(self) -> None:
         # -------------------- download window event loop

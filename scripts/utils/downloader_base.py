@@ -11,6 +11,10 @@ class YouTubeDownloader(ABC):
     """Abstract class that defines the most important needed (abstract) methods."""
 
     def __init__(self, url: str) -> None:
+        """Initializes Downloader instance.
+
+        :param str url: YouTube url
+        """
         self.url: str = url
 
     @staticmethod

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import webbrowser
 import PySimpleGUI as sg
-from pytube import YouTube, Playlist
+from pytube import YouTube, Playlist, Stream
 
 from .downloader_base import YouTubeDownloader
 from .download_option import DownloadOption
@@ -17,9 +17,12 @@ LD: DownloadOption = DownloadOption("360p", "video", True, None)
 HD: DownloadOption = DownloadOption("720p", "video", True, None)
 AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
 
-
+# -------------------- defining popups
 DOWNLOAD_DIR_POPUP: Callable[[], Any] = lambda: sg.Popup(
     "Please select a download directory", title="Info"
+)
+RESOLUTION_UNAVAILABLE_POPUP: Callable[[], Any] = lambda: sg.Popup(
+    "This resolution is resolution unavailable.", title="Info"
 )
 
 
@@ -219,6 +222,16 @@ class PlaylistDownloader(YouTubeDownloader):
 class VideoDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube video."""
 
+    __slots__: tuple[str, ...] = (
+        "url",
+        "video",
+        "hd_video",
+        "ld_video",
+        "audio_video",
+        "select_dict",
+        "download_window",
+    )
+
     def __init__(self, url: str) -> None:
         """Initializes VideoDownloader instance.
 
@@ -230,6 +243,33 @@ class VideoDownloader(YouTubeDownloader):
             on_progress_callback=self.__progress_check,
             on_complete_callback=self.__on_complete,
         )
+
+        self.hd_video: Optional[Stream] = self.video.streams.filter(
+            resolution=HD.RESOLUTION,
+            type=HD.TYPE,
+            progressive=HD.PROGRESSIVE,
+            abr=HD.ABR,
+        ).first()
+
+        self.ld_video: Optional[Stream] = self.video.streams.filter(
+            resolution=LD.RESOLUTION,
+            type=LD.TYPE,
+            progressive=LD.PROGRESSIVE,
+            abr=LD.ABR,
+        ).first()
+
+        self.audio_video: Optional[Stream] = self.video.streams.filter(
+            resolution=AUDIO.RESOLUTION,
+            type=AUDIO.TYPE,
+            progressive=AUDIO.PROGRESSIVE,
+            abr=AUDIO.ABR,
+        ).first()
+
+        self.select_dict: dict[DownloadOption, Optional[Stream]] = {
+            HD: self.hd_video,
+            LD: self.ld_video,
+            AUDIO: self.audio_video,
+        }
 
         # -------------------- defining layouts
         info_tab: list[list[sg.Text | sg.Multiline]] = [
@@ -273,7 +313,9 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.video.streams.get_by_resolution(HD.RESOLUTION).filesize / 1048576, 1)} MB"  # type: ignore
+                                f"{round(self.hd_video.filesize/ 1048576, 1)} MB"
+                                if self.hd_video is not None
+                                else "Unavailable"
                             ),
                         ]
                     ],
@@ -287,7 +329,9 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
                             sg.Text(
-                                f"{round(self.video.streams.get_by_resolution(LD.RESOLUTION).filesize / 1048576, 1)} MB"  # type: ignore
+                                f"{round(self.ld_video.filesize / 1048576, 1)} MB"
+                                if self.ld_video is not None
+                                else "Unavailable"
                             ),
                         ]
                     ],
@@ -300,7 +344,9 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-AUDIO-"),
                             sg.Text(
-                                f"{round(self.video.streams.filter(type=AUDIO.TYPE, abr=AUDIO.ABR).first().filesize / 1048576, 1)} MB"  # type: ignore
+                                f"{round(self.audio_video.filesize / 1048576, 1)} MB"
+                                if self.audio_video is not None
+                                else "Unavailable"
                             ),
                         ]
                     ],
@@ -328,7 +374,7 @@ class VideoDownloader(YouTubeDownloader):
             ],
         ]
 
-        self.main_layout: list[list[sg.TabGroup]] = [
+        main_layout: list[list[sg.TabGroup]] = [
             [
                 sg.TabGroup(
                     [[sg.Tab("info", info_tab), sg.Tab("download", download_tab)]]
@@ -337,7 +383,7 @@ class VideoDownloader(YouTubeDownloader):
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", self.main_layout, modal=True
+            "Youtube Downloader", main_layout, modal=True
         )
 
     def create_window(self) -> None:
@@ -373,19 +419,16 @@ class VideoDownloader(YouTubeDownloader):
         self.download_window.close()
 
     def download(self, download_option: DownloadOption) -> None:
+        if self.select_dict[download_option] is None:
+            RESOLUTION_UNAVAILABLE_POPUP()
+            return
+
         if not self.folder:
             DOWNLOAD_DIR_POPUP()
             return
         (
-            self.video.streams.filter(
-                resolution=download_option.RESOLUTION,
-                type=download_option.TYPE,
-                progressive=download_option.PROGRESSIVE,
-                abr=download_option.ABR,
-            )
-            .first()
-            .download(  # type: ignore
-                output_path=self.folder,  # type: ignore
+            self.select_dict[download_option].download(  # type: ignore
+                output_path=self.folder,
                 filename=f"{self.rename_file(self.folder, self.remove_forbidden_characters(self.video.title))}.mp4",
             )
         )

@@ -282,11 +282,7 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
-                            sg.Text(
-                                f"{round(self.select_dict[HD].filesize / 1048576, 1)} MB"  # type: ignore
-                                if self.select_dict[HD] is not None
-                                else "Unavailable"
-                            ),
+                            sg.Text(self.get_video_size(HD)),
                         ]
                     ],
                 )
@@ -298,11 +294,7 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
-                            sg.Text(
-                                f"{round(self.select_dict[LD].filesize / 1048576, 1)} MB"  # type: ignore
-                                if self.select_dict[LD] is not None
-                                else "Unavailable"
-                            ),
+                            sg.Text(self.get_video_size(LD)),
                         ]
                     ],
                 )
@@ -313,11 +305,7 @@ class VideoDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download", key="-AUDIO-"),
-                            sg.Text(
-                                f"{round(self.select_dict[AUDIO].filesize / 1048576, 1)} MB"  # type: ignore
-                                if self.select_dict[AUDIO] is not None
-                                else "Unavailable"
-                            ),
+                            sg.Text(self.get_video_size(AUDIO)),
                         ]
                     ],
                 )
@@ -364,6 +352,12 @@ class VideoDownloader(YouTubeDownloader):
             progressive=download_option.PROGRESSIVE,
             abr=download_option.ABR,
         ).first()
+
+    def get_video_size(self, download_option: DownloadOption) -> str:
+        """Returns the size of the video to the corresponding download option."""
+        if self.select_dict[download_option] is None:
+            return "Unavailable"
+        return f"{round(self.select_dict[download_option].filesize / 1048576, 1)} MB"  # type: ignore
 
     def create_window(self) -> None:
         # -------------------- download window event loop

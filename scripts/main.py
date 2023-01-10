@@ -27,10 +27,10 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
         r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?"
     )
 
-    if re.search(youtube_video_pattern, url):
-        return VideoDownloader(url)
     if re.search(youtube_playlist_pattern, url):
         return PlaylistDownloader(url)
+    if re.search(youtube_video_pattern, url):
+        return VideoDownloader(url)
     raise pytube.exceptions.RegexMatchError(
         "get_valid_downloader", "youtube_video_pattern or youtube_playlist_pattern"
     )

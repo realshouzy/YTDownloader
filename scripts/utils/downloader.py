@@ -33,6 +33,16 @@ class PlaylistDownloader(YouTubeDownloader):
         super().__init__(url)
         self.playlist: Playlist = Playlist(self.url)
 
+        # -------------------- binding the playlists (list of streams) to corresponding download option
+        hd_list: list[Stream] = self.get_playlist(HD)
+        ld_list: list[Stream] = self.get_playlist(LD)
+        audio_list: list[Stream] = self.get_playlist(AUDIO)
+        self.select_dict: dict[DownloadOption, Optional[list[Stream]]] = {
+            HD: hd_list if len(hd_list) == self.playlist.length else None,
+            LD: ld_list if len(ld_list) == self.playlist.length else None,
+            AUDIO: ld_list if len(audio_list) == self.playlist.length else None,
+        }
+
         # -------------------- defining layouts
         info_tab: list[list[sg.Text]] = [
             [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
@@ -59,7 +69,7 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download All", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
-                            sg.Text(f"{self.get_playlist_size(HD)} MB"),
+                            sg.Text(self.get_playlist_size(HD)),
                         ]
                     ],
                 )
@@ -71,7 +81,7 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download All", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
-                            sg.Text(f"{self.get_playlist_size(LD)} MB"),
+                            sg.Text(self.get_playlist_size(LD)),
                         ]
                     ],
                 )
@@ -82,7 +92,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-AUDIOALL-"),
-                            sg.Text(f"{self.get_playlist_size(AUDIO)} MB"),
+                            sg.Text(self.get_playlist_size(AUDIO)),
                         ]
                     ],
                 )
@@ -126,26 +136,23 @@ class PlaylistDownloader(YouTubeDownloader):
             "Youtube Downloader", self.main_layout, modal=True
         )
 
-    def get_playlist_size(self, download_option: DownloadOption) -> float:
-        """Helper method that calculates the file size of a playlist, since pytube does not have this feature.
-
-        :param DownloadOption option: class containing the download options
-        :return float: size of the playlist
-        """
-        playlist_size: int = sum(
-            (
-                video.streams.filter(
-                    resolution=download_option.RESOLUTION,
-                    type=download_option.TYPE,
-                    progressive=download_option.PROGRESSIVE,
-                    abr=download_option.ABR,
-                )
-                .first()
-                .filesize  # type: ignore
-            )
+    def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
+        """Returns a list of the streams to the corresponding download option."""
+        return [
+            video.streams.filter(
+                resolution=download_option.RESOLUTION,
+                type=download_option.TYPE,
+                progressive=download_option.PROGRESSIVE,
+                abr=download_option.ABR,
+            ).first()
             for video in self.playlist.videos
-        )
-        return round(playlist_size / 1048576, 1)
+        ]  # type: ignore
+
+    def get_playlist_size(self, download_option: DownloadOption) -> str:
+        """Returns the size of the playlist to the corresponding download option."""
+        if self.select_dict[download_option] is None:
+            return "Unavailable"
+        return f"{round(sum(video.filesize for video in self.select_dict[download_option]) / 1048576,1,)} MB"  # type: ignore
 
     def create_window(self) -> None:
         # -------------------- download window event loop
@@ -177,6 +184,10 @@ class PlaylistDownloader(YouTubeDownloader):
         self.download_window.close()
 
     def download(self, download_option: DownloadOption) -> None:
+        if self.select_dict[download_option] is None:
+            RESOLUTION_UNAVAILABLE_POPUP()
+            return
+
         if not self.folder:
             DOWNLOAD_DIR_POPUP()
             return
@@ -345,7 +356,7 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
-        """Returns the video to the corresponding download option."""
+        """Returns the stream to the corresponding download option."""
         return self.video.streams.filter(
             resolution=download_option.RESOLUTION,
             type=download_option.TYPE,

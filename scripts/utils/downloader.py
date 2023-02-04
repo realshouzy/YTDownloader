@@ -22,12 +22,20 @@ DOWNLOAD_DIR_POPUP: Callable[[], Any] = lambda: sg.Popup(
     "Please select a download directory", title="Info"
 )
 RESOLUTION_UNAVAILABLE_POPUP: Callable[[], Any] = lambda: sg.Popup(
-    "This resolution is resolution unavailable.", title="Info"
+    "This resolution is unavailable.", title="Info"
 )
 
 
 class PlaylistDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
+
+    __slots__: tuple[str, ...] = (
+        "url",
+        "playlist",
+        "select_dict",
+        "download_window",
+        "folder",
+    )
 
     def __init__(self, url: str) -> None:
         super().__init__(url)
@@ -38,9 +46,9 @@ class PlaylistDownloader(YouTubeDownloader):
         ld_list: list[Stream] = self.get_playlist(LD)
         audio_list: list[Stream] = self.get_playlist(AUDIO)
         self.select_dict: dict[DownloadOption, Optional[list[Stream]]] = {
-            HD: hd_list if len(hd_list) == self.playlist.length else None,
-            LD: ld_list if len(ld_list) == self.playlist.length else None,
-            AUDIO: ld_list if len(audio_list) == self.playlist.length else None,
+            HD: hd_list if None not in hd_list else None,
+            LD: ld_list if None not in ld_list else None,
+            AUDIO: audio_list if None not in audio_list else None,
         }
 
         # -------------------- defining layouts
@@ -119,7 +127,7 @@ class PlaylistDownloader(YouTubeDownloader):
             ],
         ]
 
-        self.main_layout: list[list[sg.TabGroup]] = [
+        main_layout: list[list[sg.TabGroup]] = [
             [
                 sg.TabGroup(
                     [
@@ -133,7 +141,7 @@ class PlaylistDownloader(YouTubeDownloader):
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", self.main_layout, modal=True
+            "Youtube Downloader", main_layout, modal=True
         )
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
@@ -152,7 +160,7 @@ class PlaylistDownloader(YouTubeDownloader):
         """Returns the size of the playlist to the corresponding download option."""
         if self.select_dict[download_option] is None:
             return "Unavailable"
-        return f"{round(sum(video.filesize for video in self.select_dict[download_option]) / 1048576,1,)} MB"  # type: ignore
+        return f"{round(sum(video.filesize for video in self.select_dict[download_option]) / 1048576, 1)} MB"  # type: ignore
 
     def create_window(self) -> None:
         # -------------------- download window event loop
@@ -198,19 +206,10 @@ class PlaylistDownloader(YouTubeDownloader):
         )
 
         download_counter: int = 0
-        for video in self.playlist.videos:
-            (
-                video.streams.filter(
-                    resolution=download_option.RESOLUTION,
-                    type=download_option.TYPE,
-                    progressive=download_option.PROGRESSIVE,
-                    abr=download_option.ABR,
-                )
-                .first()
-                .download(  # type: ignore
-                    output_path=download_dir,  # type: ignore
-                    filename=f"{self.remove_forbidden_characters(video.title)}.mp4",
-                )
+        for video in self.select_dict[download_option]:  # type: ignore
+            video.download(
+                output_path=download_dir,  # type: ignore
+                filename=f"{self.remove_forbidden_characters(video.title)}.mp4",
             )
             download_counter += 1
             self.download_window["-DOWNLOADPROGRESS-"].update(download_counter)  # type: ignore

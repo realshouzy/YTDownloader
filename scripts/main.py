@@ -15,7 +15,7 @@ sg.theme("Darkred1")
 
 
 def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
-    """Helper function that validates wether the given url is a vaild YouTube Playlist or Video link and returns the appropriate downloader.
+    """Helper function that returns the appropriate YouTube downloader based on the given url.
 
     :param str url: YouTube url
     :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
@@ -57,11 +57,11 @@ def main() -> None:
                 )
                 youtube_downloader.create_window()
 
-        except pytube.exceptions.RegexMatchError as rmx:
-            if not values["-LINKINPUT-"]:  # type: ignore
-                ErrorWindow(rmx, "Please provide link.").create()
-            else:
-                ErrorWindow(rmx, "Invalid link.").create()
+        # except pytube.exceptions.RegexMatchError as rmx:
+        #     if not values["-LINKINPUT-"]:  # type: ignore
+        #         ErrorWindow(rmx, "Please provide link.").create()
+        #     else:
+        #         ErrorWindow(rmx, "Invalid link.").create()
 
         except pytube.exceptions.VideoPrivate as vpx:
             ErrorWindow(vpx, "Video is privat.").create()
@@ -80,13 +80,13 @@ def main() -> None:
                 key_exce, "Video or playlist is unreachable or invalid."
             ).create()
 
-        except Exception as exce:
-            ErrorWindow(
-                exce,
-                "Unexpected error\n"
-                f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
-            ).create()
-            break
+        # except Exception as exce:
+        #     ErrorWindow(
+        #         exce,
+        #         "Unexpected error\n"
+        #         f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
+        #     ).create()
+        #     break
 
     start_window.close()
 

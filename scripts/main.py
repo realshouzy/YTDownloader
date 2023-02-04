@@ -57,11 +57,11 @@ def main() -> None:
                 )
                 youtube_downloader.create_window()
 
-        # except pytube.exceptions.RegexMatchError as rmx:
-        #     if not values["-LINKINPUT-"]:  # type: ignore
-        #         ErrorWindow(rmx, "Please provide link.").create()
-        #     else:
-        #         ErrorWindow(rmx, "Invalid link.").create()
+        except pytube.exceptions.RegexMatchError as rmx:
+            if not values["-LINKINPUT-"]:  # type: ignore
+                ErrorWindow(rmx, "Please provide link.").create()
+            else:
+                ErrorWindow(rmx, "Invalid link.").create()
 
         except pytube.exceptions.VideoPrivate as vpx:
             ErrorWindow(vpx, "Video is privat.").create()
@@ -80,13 +80,13 @@ def main() -> None:
                 key_exce, "Video or playlist is unreachable or invalid."
             ).create()
 
-        # except Exception as exce:
-        #     ErrorWindow(
-        #         exce,
-        #         "Unexpected error\n"
-        #         f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
-        #     ).create()
-        #     break
+        except Exception as exce:
+            ErrorWindow(
+                exce,
+                "Unexpected error\n"
+                f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
+            ).create()
+            break
 
     start_window.close()
 

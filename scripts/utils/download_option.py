@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 """Module containing all a dataclass for the download option."""
 from __future__ import annotations
-from typing import Optional
+
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass(frozen=True, order=True, slots=True)

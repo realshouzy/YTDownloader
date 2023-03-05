@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import webbrowser
+
 import PySimpleGUI as sg
 
 
@@ -19,7 +20,7 @@ class ErrorWindow:
         ]
 
         self.error_window: sg.Window = sg.Window(
-            "Error", layout=self.error_layout, modal=True
+            "Error", layout=self.error_layout, modal=True,
         )
 
     def create(self) -> None:

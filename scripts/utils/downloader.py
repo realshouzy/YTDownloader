@@ -1,16 +1,18 @@
 # -*- coding: UTF-8 -*-
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
-from typing import Any, Optional, Callable
-from pathlib import Path
 
 import webbrowser
+from typing import TYPE_CHECKING, Any, Optional
+
 import PySimpleGUI as sg
-from pytube import YouTube, Playlist, Stream
+from pytube import Playlist, Stream, YouTube
 
-from .downloader_base import YouTubeDownloader
 from .download_option import DownloadOption
+from .downloader_base import YouTubeDownloader
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # -------------------- defining download options
 LD: DownloadOption = DownloadOption("360p", "video", True, None)
@@ -18,12 +20,10 @@ HD: DownloadOption = DownloadOption("720p", "video", True, None)
 AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
 
 # -------------------- defining popups
-DOWNLOAD_DIR_POPUP: Callable[[], Any] = lambda: sg.Popup(
-    "Please select a download directory", title="Info"
-)
-RESOLUTION_UNAVAILABLE_POPUP: Callable[[], Any] = lambda: sg.Popup(
-    "This resolution is unavailable.", title="Info"
-)
+def DOWNLOAD_DIR_POPUP():
+    return sg.Popup("Please select a download directory", title="Info")
+def RESOLUTION_UNAVAILABLE_POPUP():
+    return sg.Popup("This resolution is unavailable.", title="Info")
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -78,9 +78,9 @@ class PlaylistDownloader(YouTubeDownloader):
                             sg.Button("Download All", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
                             sg.Text(self.get_playlist_size(HD)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [
                 sg.Frame(
@@ -90,9 +90,9 @@ class PlaylistDownloader(YouTubeDownloader):
                             sg.Button("Download All", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
                             sg.Text(self.get_playlist_size(LD)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [
                 sg.Frame(
@@ -101,9 +101,9 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download All", key="-AUDIOALL-"),
                             sg.Text(self.get_playlist_size(AUDIO)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [sg.VPush()],
             [
@@ -113,7 +113,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     size=(57, 1),
                     justification="c",
                     font="underline",
-                )
+                ),
             ],
             [
                 sg.Progress(
@@ -123,7 +123,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     key="-DOWNLOADPROGRESS-",
                     expand_x=True,
                     bar_color="Black",
-                )
+                ),
             ],
         ]
 
@@ -134,14 +134,14 @@ class PlaylistDownloader(YouTubeDownloader):
                         [
                             sg.Tab("info", info_tab),
                             sg.Tab("download all", download_all_tab),
-                        ]
-                    ]
-                )
-            ]
+                        ],
+                    ],
+                ),
+            ],
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", main_layout, modal=True
+            "Youtube Downloader", main_layout, modal=True,
         )
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
@@ -214,7 +214,7 @@ class PlaylistDownloader(YouTubeDownloader):
             download_counter += 1
             self.download_window["-DOWNLOADPROGRESS-"].update(download_counter)  # type: ignore
             self.download_window["-COMPLETED-"].update(
-                f"{download_counter} of {self.playlist.length}"  # type: ignore
+                f"{download_counter} of {self.playlist.length}",  # type: ignore
             )
         self.__download_complete()
 
@@ -293,9 +293,9 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-HD-"),
                             sg.Text(HD.RESOLUTION),  # type: ignore
                             sg.Text(self.get_video_size(HD)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [
                 sg.Frame(
@@ -305,9 +305,9 @@ class VideoDownloader(YouTubeDownloader):
                             sg.Button("Download", key="-LD-"),
                             sg.Text(LD.RESOLUTION),  # type: ignore
                             sg.Text(self.get_video_size(LD)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [
                 sg.Frame(
@@ -316,9 +316,9 @@ class VideoDownloader(YouTubeDownloader):
                         [
                             sg.Button("Download", key="-AUDIO-"),
                             sg.Text(self.get_video_size(AUDIO)),
-                        ]
+                        ],
                     ],
-                )
+                ),
             ],
             [sg.VPush()],
             [
@@ -328,7 +328,7 @@ class VideoDownloader(YouTubeDownloader):
                     size=(40, 1),
                     justification="c",
                     font="underline",
-                )
+                ),
             ],
             [
                 sg.Progress(
@@ -338,20 +338,20 @@ class VideoDownloader(YouTubeDownloader):
                     key="-DOWNLOADPROGRESS-",
                     expand_x=True,
                     bar_color="Black",
-                )
+                ),
             ],
         ]
 
         main_layout: list[list[sg.TabGroup]] = [
             [
                 sg.TabGroup(
-                    [[sg.Tab("info", info_tab), sg.Tab("download", download_tab)]]
-                )
-            ]
+                    [[sg.Tab("info", info_tab), sg.Tab("download", download_tab)]],
+                ),
+            ],
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", main_layout, modal=True
+            "Youtube Downloader", main_layout, modal=True,
         )
 
     def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
@@ -417,18 +417,18 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def __progress_check(
-        self, stream: Any, chunk: bytes, bytes_remaining: int
+        self, stream: Any, chunk: bytes, bytes_remaining: int,
     ) -> None:  # parameters are necessary
         """Helper method that updated the progress bar when progress in the video download was made."""
         self.download_window["-DOWNLOADPROGRESS-"].update(
-            100 - round(bytes_remaining / stream.filesize * 100)  # type: ignore
+            100 - round(bytes_remaining / stream.filesize * 100),  # type: ignore
         )
         self.download_window["-COMPLETED-"].update(
-            f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed"  # type: ignore
+            f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",  # type: ignore
         )
 
     def __on_complete(
-        self, stream: Any, file_path: Optional[str]
+        self, stream: Any, file_path: Optional[str],
     ) -> None:  # parameters are necessary
         """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore

@@ -11,3 +11,4 @@ dist/
 *.ico
 /TODO.md
 /venv
+.ruff_cache

@@ -1,10 +1,13 @@
 # -*- coding: UTF-8 -*-
 """Module containing the base class for the YouTube downloader."""
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from .download_option import DownloadOption
+if TYPE_CHECKING:
+    from .download_option import DownloadOption
 
 
 class YouTubeDownloader(ABC):

@@ -4,12 +4,11 @@
 from __future__ import annotations
 
 import re
+
 import PySimpleGUI as sg
 import pytube.exceptions
-
-from utils.downloader import VideoDownloader, PlaylistDownloader
+from utils.downloader import PlaylistDownloader, VideoDownloader
 from utils.error_window import ErrorWindow
-
 
 sg.theme("Darkred1")
 
@@ -21,10 +20,10 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
     """
     youtube_playlist_pattern: re.Pattern[str] = re.compile(
-        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})"
+        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
     )
     youtube_video_pattern: re.Pattern[str] = re.compile(
-        r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?"
+        r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?",
     )
 
     if re.search(youtube_playlist_pattern, url):
@@ -32,7 +31,8 @@ def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     if re.search(youtube_video_pattern, url):
         return VideoDownloader(url)
     raise pytube.exceptions.RegexMatchError(
-        "get_valid_downloader", "youtube_video_pattern or youtube_playlist_pattern"
+        "get_valid_downloader",
+        "youtube_video_pattern or youtube_playlist_pattern",
     )
 
 
@@ -77,7 +77,8 @@ def main() -> None:
 
         except KeyError as key_exce:
             ErrorWindow(
-                key_exce, "Video or playlist is unreachable or invalid."
+                key_exce,
+                "Video or playlist is unreachable or invalid.",
             ).create()
 
         except Exception as exce:

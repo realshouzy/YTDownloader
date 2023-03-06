@@ -19,9 +19,12 @@ LD: DownloadOption = DownloadOption("360p", "video", True, None)
 HD: DownloadOption = DownloadOption("720p", "video", True, None)
 AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
 
+
 # -------------------- defining popups
 def DOWNLOAD_DIR_POPUP():
     return sg.Popup("Please select a download directory", title="Info")
+
+
 def RESOLUTION_UNAVAILABLE_POPUP():
     return sg.Popup("This resolution is unavailable.", title="Info")
 
@@ -141,7 +144,9 @@ class PlaylistDownloader(YouTubeDownloader):
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", main_layout, modal=True,
+            "Youtube Downloader",
+            main_layout,
+            modal=True,
         )
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
@@ -351,7 +356,9 @@ class VideoDownloader(YouTubeDownloader):
         ]
 
         self.download_window: sg.Window = sg.Window(
-            "Youtube Downloader", main_layout, modal=True,
+            "Youtube Downloader",
+            main_layout,
+            modal=True,
         )
 
     def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
@@ -417,7 +424,10 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def __progress_check(
-        self, stream: Any, chunk: bytes, bytes_remaining: int,
+        self,
+        stream: Any,
+        chunk: bytes,
+        bytes_remaining: int,
     ) -> None:  # parameters are necessary
         """Helper method that updated the progress bar when progress in the video download was made."""
         self.download_window["-DOWNLOADPROGRESS-"].update(
@@ -428,7 +438,9 @@ class VideoDownloader(YouTubeDownloader):
         )
 
     def __on_complete(
-        self, stream: Any, file_path: Optional[str],
+        self,
+        stream: Any,
+        file_path: Optional[str],
     ) -> None:  # parameters are necessary
         """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore

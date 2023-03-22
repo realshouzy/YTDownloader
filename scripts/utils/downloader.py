@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import webbrowser
+from multiprocessing.pool import ThreadPool as ProcessPool
 from typing import TYPE_CHECKING, Any, Optional
 
 import PySimpleGUI as sg
@@ -21,12 +22,14 @@ AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
 
 
 # -------------------- defining popups
-def DOWNLOAD_DIR_POPUP():
-    return sg.Popup("Please select a download directory", title="Info")
+def DOWNLOAD_DIR_POPUP() -> None:
+    """Creates an info pop telling 'Please select a download directory.'"""
+    sg.Popup("Please select a download directory", title="Info")
 
 
-def RESOLUTION_UNAVAILABLE_POPUP():
-    return sg.Popup("This resolution is unavailable.", title="Info")
+def RESOLUTION_UNAVAILABLE_POPUP() -> None:
+    """Creates an info pop telling 'This resolution is unavailable.'"""
+    sg.Popup("This resolution is unavailable.", title="Info")
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -149,17 +152,34 @@ class PlaylistDownloader(YouTubeDownloader):
             modal=True,
         )
 
+    def _get_stream_from_video(
+        self,
+        video: YouTube,
+        download_option: DownloadOption,
+    ) -> Stream:
+        return video.streams.filter(
+            resolution=download_option.RESOLUTION,
+            type=download_option.TYPE,
+            progressive=download_option.PROGRESSIVE,
+            abr=download_option.ABR,
+        ).first()  # type: ignore
+
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
-        """Returns a list of the streams to the corresponding download option."""
-        return [
-            video.streams.filter(
-                resolution=download_option.RESOLUTION,
-                type=download_option.TYPE,
-                progressive=download_option.PROGRESSIVE,
-                abr=download_option.ABR,
-            ).first()
-            for video in self.playlist.videos
-        ]  # type: ignore
+        """Returns a list of the streams to the corresponding download option by using threads."""
+        args_list: list[tuple[YouTube, DownloadOption]] = list(
+            zip(
+                self.playlist.videos,
+                [download_option] * self.playlist.length,
+                strict=True,
+            ),
+        )
+
+        with ProcessPool() as pool:
+            stream_list: list[Stream] = pool.starmap(
+                self._get_stream_from_video,
+                args_list,
+            )
+        return stream_list
 
     def get_playlist_size(self, download_option: DownloadOption) -> str:
         """Returns the size of the playlist to the corresponding download option."""

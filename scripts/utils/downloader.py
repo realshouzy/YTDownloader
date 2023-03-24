@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import webbrowser
-from multiprocessing.pool import ThreadPool as ProcessPool
+from multiprocessing.pool import ThreadPool
 from typing import TYPE_CHECKING, Any, Optional
 
 import PySimpleGUI as sg
@@ -22,12 +22,12 @@ AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
 
 
 # -------------------- defining popups
-def DOWNLOAD_DIR_POPUP() -> None:
+def download_dir_popup() -> None:
     """Creates an info pop telling 'Please select a download directory.'"""
     sg.Popup("Please select a download directory", title="Info")
 
 
-def RESOLUTION_UNAVAILABLE_POPUP() -> None:
+def resolution_unavailable_popup() -> None:
     """Creates an info pop telling 'This resolution is unavailable.'"""
     sg.Popup("This resolution is unavailable.", title="Info")
 
@@ -166,18 +166,16 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
         """Returns a list of the streams to the corresponding download option by using threads."""
-        args_list: list[tuple[YouTube, DownloadOption]] = list(
-            zip(
-                self.playlist.videos,
-                [download_option] * self.playlist.length,
-                strict=True,
-            ),
+        args: zip[tuple[YouTube, DownloadOption]] = zip(
+            self.playlist.videos,
+            (download_option,) * self.playlist.length,
+            strict=True,
         )
-
-        with ProcessPool() as pool:
+        assert len(list(args)) == self.playlist.length
+        with ThreadPool() as pool:
             stream_list: list[Stream] = pool.starmap(
                 self._get_stream_from_video,
-                args_list,
+                args,
             )
         return stream_list
 
@@ -218,11 +216,11 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def download(self, download_option: DownloadOption) -> None:
         if self.select_dict[download_option] is None:
-            RESOLUTION_UNAVAILABLE_POPUP()
+            resolution_unavailable_popup()
             return
 
         if not self.folder:
-            DOWNLOAD_DIR_POPUP()
+            download_dir_popup()
             return
 
         download_dir: Path = self.rename_dir(
@@ -430,11 +428,11 @@ class VideoDownloader(YouTubeDownloader):
 
     def download(self, download_option: DownloadOption) -> None:
         if self.select_dict[download_option] is None:
-            RESOLUTION_UNAVAILABLE_POPUP()
+            resolution_unavailable_popup()
             return
 
         if not self.folder:
-            DOWNLOAD_DIR_POPUP()
+            download_dir_popup()
             return
         (
             self.select_dict[download_option].download(  # type: ignore

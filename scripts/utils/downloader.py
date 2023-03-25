@@ -152,11 +152,12 @@ class PlaylistDownloader(YouTubeDownloader):
             modal=True,
         )
 
-    def _get_stream_from_video(
-        self,
+    @staticmethod
+    def get_stream_from_video(
         video: YouTube,
         download_option: DownloadOption,
     ) -> Stream:
+        """Returns the streams filtered according to the download options"""
         return video.streams.filter(
             resolution=download_option.RESOLUTION,
             type=download_option.TYPE,
@@ -166,15 +167,17 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
         """Returns a list of the streams to the corresponding download option by using threads."""
-        args: zip[tuple[YouTube, DownloadOption]] = zip(
-            self.playlist.videos,
-            (download_option,) * self.playlist.length,
-            strict=True,
+        args: tuple[tuple[YouTube, DownloadOption], ...] = tuple(
+            zip(
+                self.playlist.videos,
+                (download_option,) * self.playlist.length,
+                strict=True,
+            ),
         )
-        assert len(list(args)) == self.playlist.length
+        assert len(args) == self.playlist.length
         with ThreadPool() as pool:
             stream_list: list[Stream] = pool.starmap(
-                self._get_stream_from_video,
+                PlaylistDownloader.get_stream_from_video,
                 args,
             )
         return stream_list

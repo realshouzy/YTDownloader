@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
@@ -9,28 +10,13 @@ from typing import TYPE_CHECKING, Any, Optional
 import PySimpleGUI as sg
 from pytube import Playlist, Stream, YouTube
 
-from .download_option import DownloadOption
+from .download_option import AUDIO, HD, LD, DownloadOption
 from .downloader_base import YouTubeDownloader
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-# -------------------- defining download options
-LD: DownloadOption = DownloadOption("360p", "video", True, None)
-HD: DownloadOption = DownloadOption("720p", "video", True, None)
-AUDIO: DownloadOption = DownloadOption(None, "audio", False, "128kbps")
-
-
-# -------------------- defining popups
-def download_dir_popup() -> None:
-    """Creates an info pop telling 'Please select a download directory.'"""
-    sg.Popup("Please select a download directory", title="Info")
-
-
-def resolution_unavailable_popup() -> None:
-    """Creates an info pop telling 'This resolution is unavailable.'"""
-    sg.Popup("This resolution is unavailable.", title="Info")
-
+__all__: list[str] = ["PlaylistDownloader", "VideoDownloader"]
 
 class PlaylistDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
@@ -82,7 +68,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-HD-"),
-                            sg.Text(HD.RESOLUTION),  # type: ignore
+                            sg.Text(HD.resolution),  # type: ignore
                             sg.Text(self.get_playlist_size(HD)),
                         ],
                     ],
@@ -94,7 +80,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-LD-"),
-                            sg.Text(LD.RESOLUTION),  # type: ignore
+                            sg.Text(LD.resolution),  # type: ignore
                             sg.Text(self.get_playlist_size(LD)),
                         ],
                     ],
@@ -159,10 +145,10 @@ class PlaylistDownloader(YouTubeDownloader):
     ) -> Stream:
         """Returns the streams filtered according to the download options"""
         return video.streams.filter(
-            resolution=download_option.RESOLUTION,
-            type=download_option.TYPE,
-            progressive=download_option.PROGRESSIVE,
-            abr=download_option.ABR,
+            resolution=download_option.resolution,
+            type=download_option.type_,
+            progressive=download_option.progressive,
+            abr=download_option.abr,
         ).first()  # type: ignore
 
     def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
@@ -219,11 +205,11 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def download(self, download_option: DownloadOption) -> None:
         if self.select_dict[download_option] is None:
-            resolution_unavailable_popup()
+            self.resolution_unavailable_popup()
             return
 
         if not self.folder:
-            download_dir_popup()
+            self.download_dir_popup()
             return
 
         download_dir: Path = self.rename_dir(
@@ -317,7 +303,7 @@ class VideoDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download", key="-HD-"),
-                            sg.Text(HD.RESOLUTION),  # type: ignore
+                            sg.Text(HD.resolution),  # type: ignore
                             sg.Text(self.get_video_size(HD)),
                         ],
                     ],
@@ -329,7 +315,7 @@ class VideoDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download", key="-LD-"),
-                            sg.Text(LD.RESOLUTION),  # type: ignore
+                            sg.Text(LD.resolution),  # type: ignore
                             sg.Text(self.get_video_size(LD)),
                         ],
                     ],
@@ -385,10 +371,10 @@ class VideoDownloader(YouTubeDownloader):
     def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
         """Returns the stream to the corresponding download option."""
         return self.video.streams.filter(
-            resolution=download_option.RESOLUTION,
-            type=download_option.TYPE,
-            progressive=download_option.PROGRESSIVE,
-            abr=download_option.ABR,
+            resolution=download_option.resolution,
+            type=download_option.type_,
+            progressive=download_option.progressive,
+            abr=download_option.abr,
         ).first()
 
     def get_video_size(self, download_option: DownloadOption) -> str:
@@ -431,11 +417,11 @@ class VideoDownloader(YouTubeDownloader):
 
     def download(self, download_option: DownloadOption) -> None:
         if self.select_dict[download_option] is None:
-            resolution_unavailable_popup()
+            self.resolution_unavailable_popup()
             return
 
         if not self.folder:
-            download_dir_popup()
+            self.download_dir_popup()
             return
         (
             self.select_dict[download_option].download(  # type: ignore
@@ -447,7 +433,7 @@ class VideoDownloader(YouTubeDownloader):
     def __progress_check(
         self,
         stream: Any,
-        chunk: bytes,
+        chunk: bytes,  # pylint: disable=unused-argument
         bytes_remaining: int,
     ) -> None:  # parameters are necessary
         """Helper method that updated the progress bar when progress in the video download was made."""
@@ -460,8 +446,8 @@ class VideoDownloader(YouTubeDownloader):
 
     def __on_complete(
         self,
-        stream: Any,
-        file_path: Optional[str],
+        stream: Any,  # pylint: disable=unused-argument
+        file_path: Optional[str],  # pylint: disable=unused-argument
     ) -> None:  # parameters are necessary
         """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore

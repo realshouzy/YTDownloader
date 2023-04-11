@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """Module containing the base class for the YouTube downloader."""
 from __future__ import annotations
@@ -6,8 +7,12 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import PySimpleGUI as sg
+
 if TYPE_CHECKING:
     from .download_option import DownloadOption
+
+__all__: list[str] = ["YouTubeDownloader"]
 
 
 class YouTubeDownloader(ABC):
@@ -31,7 +36,7 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def rename_dir(root: Path | str, sub: Path | str) -> Path:
-        """Helper method that renames the the folder if the user download the playlist more than once.
+        """Helper method that renames the folder if the user download the playlist more than once.
 
         :param Path | str root: Path in which the playlist folder will be created
         :param Path | str sub: Folder in which the playlist will be downloaded
@@ -43,31 +48,41 @@ class YouTubeDownloader(ABC):
             return original_path
 
         i: int = 1
-        while True:
+        while Path(f"{root}/{sub} ({i})").exists():
             i += 1
-            new_path: Path = Path(f"{root}/{sub} ({i})")
 
-            if not new_path.exists():
-                return new_path
+        new_path: Path = Path(f"{root}/{sub} ({i})")
+        return new_path
 
     @staticmethod
     def rename_file(root: Path | str, file_name: str) -> str:
-        """Helper method that renames the the file if the user download the video more than once.
+        """Helper method that renames the file if the user download the video more than once.
 
         :param Path | str root: Path in which the file will be downloaded
         :param str file_name: video title
         :return str file_name | new_file_name: either original file name or new, incremented file name
         """
-        if not Path(f"{root}/{file_name}.mp4").exists():
+        file_path: Path = Path(f"{root}/{file_name}.mp4")
+        if not file_path.exists():
             return file_name
 
         i: int = 1
-        while True:
+        while Path(f"{root}/{file_name} ({i}).mp4").exists():
             i += 1
-            new_file_name: str = f"{file_name} ({i})"
 
-            if not Path(f"{root}/{new_file_name} ({i}).mp4").exists():
-                return new_file_name
+        new_file_name: str = f"{file_name} ({i})"
+        return new_file_name
+
+    # -------------------- defining popups
+    @staticmethod
+    def download_dir_popup() -> None:
+        """Creates an info pop telling 'Please select a download directory.'"""
+        sg.Popup("Please select a download directory", title="Info")
+
+    @staticmethod
+    def resolution_unavailable_popup() -> None:
+        """Creates an info pop telling 'This resolution is unavailable.'"""
+        sg.Popup("This resolution is unavailable.", title="Info")
 
     @abstractmethod
     def create_window(self) -> None:

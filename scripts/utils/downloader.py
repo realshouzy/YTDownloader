@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 __all__: list[str] = ["PlaylistDownloader", "VideoDownloader"]
 
+
 class PlaylistDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
 
@@ -179,7 +180,9 @@ class PlaylistDownloader(YouTubeDownloader):
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
-                self.folder: str = values["-FOLDER-"]
+                self.folder: str = (  # pylint: disable=attribute-defined-outside-init
+                    values["-FOLDER-"]
+                )
             except TypeError:
                 break
 
@@ -388,7 +391,9 @@ class VideoDownloader(YouTubeDownloader):
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
-                self.folder: str = values["-FOLDER-"]
+                self.folder: str = (  # pylint: disable=attribute-defined-outside-init
+                    values["-FOLDER-"]
+                )
             except TypeError:
                 break
 

@@ -81,7 +81,7 @@ def main() -> None:
                 "Video or playlist is unreachable or invalid.",
             ).create()
 
-        except Exception as exce:
+        except Exception as exce:  # pylint: disable=broad-exception-caught
             ErrorWindow(
                 exce,
                 "Unexpected error\n"

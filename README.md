@@ -30,8 +30,7 @@ The icon can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUW
 
 **WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!**
 
-Note that ``pytube`` occasionally shows some issues.
-
+Note that ``pytube`` occasionally shows some issues with downloading playlists.
 
 ## Download
 

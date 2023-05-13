@@ -37,29 +37,21 @@ Note that ``pytube`` occasionally shows some issues with downloading playlists.
 You can find the realeses [here](https://github.com/realshouzy/YTDownloader/releases)
 
 - For Windows just download the executable
-- For Linux or macOS download the source code, install the requirements via pip and  run the ``main.py`` in the scripts folder (requires Python 3.11 or newer)
+- For Linux or macOS download the source code, install the requirements via pip and  run the [main.py](scripts/main.py) in the scripts module as a file
 
 <br />
 
-## Tutorial
+## Running the Program
 
-### Running the Program
+### Requirements
 
-#### Requirements
-
-If you run the the python script directly, you need to install the third party requirements:
-
-```bash
-pip install -r requirements.txt
-```
-
+Make sure you have Python 3.11 or higher install.
 The used libraries are:
 
 ```python
 # standard library
 import re
 import webbrowser
-import dataclasses
 import typing
 import abc
 import pathlib
@@ -70,7 +62,23 @@ import PySimpleGUI
 import pytube
 ```
 
-#### Video
+### On Windows
+
+Just run the executable.
+
+### On Linux or macOS
+
+```bash
+git clone https://github.com/realshouzy/YTDownloader.git
+
+pip install -r requirements.txt
+
+python3 -m script.main
+```
+
+## Tutorial
+
+### Video
 
 1. Step:
 
@@ -122,7 +130,7 @@ import pytube
 <br />
 <br />
 
-#### Playlist
+### Playlist
 
 1. Step:
 

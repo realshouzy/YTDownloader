@@ -7,12 +7,11 @@ from typing import TYPE_CHECKING, Literal
 
 import PySimpleGUI as sg
 import pytube.exceptions
-
-from .utils.downloader import get_downloader
-from .utils.error_window import ErrorWindow
+from utils.downloader import get_downloader
+from utils.error_window import ErrorWindow
 
 if TYPE_CHECKING:
-    from .utils.downloader import PlaylistDownloader, VideoDownloader
+    from utils.downloader import PlaylistDownloader, VideoDownloader
 
 sg.theme("Darkred1")
 

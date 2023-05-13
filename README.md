@@ -15,7 +15,7 @@
 
 [![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
 [![Code Size](https://img.shields.io/github/languages/code-size/realshouzy/YTDownloader)](https://github.com/realshouzy/YTDownloader)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/realshouzy/YTDownloader/blob/main/LICENSE)
 
 </div>
 
@@ -36,8 +36,8 @@ Note that ``pytube`` occasionally shows some issues with downloading playlists.
 
 You can find the realeses [here](https://github.com/realshouzy/YTDownloader/releases)
 
-- For Windows just download the executable
-- For Linux or macOS download the source code, install the requirements via pip and  run the [main.py](scripts/main.py) in the scripts module as a file
+- For Windows just download the executable [here](https://github.com/realshouzy/YTDownloader/releases)
+- For Linux or macOS download the source code, install the [requirements](requirements.txt) via pip and run the [main.py](scripts/main.py) in the scripts module as a file
 
 <br />
 
@@ -46,16 +46,17 @@ You can find the realeses [here](https://github.com/realshouzy/YTDownloader/rele
 ### Requirements
 
 Make sure you have Python 3.11 or higher install.
+
 The used libraries are:
 
 ```python
 # standard library
-import re
-import webbrowser
-import typing
 import abc
-import pathlib
 import multiprocessing.pool
+import pathlib
+import re
+import typing
+import webbrowser
 
 # third party
 import PySimpleGUI

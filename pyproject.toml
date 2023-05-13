@@ -1,3 +1,19 @@
+[project]
+name = "YTDownloader"
+version = "1.4"
+description = "A program to download any YouTube video or playlist"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "realshouzy" }]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython"
+]
+requires-python = ">=3.11"
+dependencies = ["pytube", "PySimpleGUI"]
+
 [tool.mypy]
 strict = false
 check_untyped_defs = true

@@ -48,6 +48,9 @@ def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     )
 
 
+# pylint: disable=attribute-defined-outside-init
+
+
 class PlaylistDownloader(YouTubeDownloader):
     """Class that contains and creates the window and necessary methods to download a YouTube playlist."""
 
@@ -209,9 +212,7 @@ class PlaylistDownloader(YouTubeDownloader):
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
-                self.folder: str = (  # pylint: disable=attribute-defined-outside-init
-                    values["-FOLDER-"]
-                )
+                self.folder: str = values["-FOLDER-"]
             except TypeError:
                 break
 
@@ -244,7 +245,7 @@ class PlaylistDownloader(YouTubeDownloader):
             self.download_dir_popup()
             return
 
-        download_dir: Path = self.rename_dir(
+        download_dir: Path = self.increment_dir_name(
             self.folder,
             self.remove_forbidden_characters(self.playlist.title),
         )
@@ -252,7 +253,7 @@ class PlaylistDownloader(YouTubeDownloader):
         download_counter: int = 0
         for video in self.select_dict[download_option]:  # type: ignore
             video.download(
-                output_path=download_dir,  # type: ignore
+                output_path=str(download_dir),
                 filename=f"{self.remove_forbidden_characters(video.title)}.mp4",
             )
             download_counter += 1
@@ -260,9 +261,9 @@ class PlaylistDownloader(YouTubeDownloader):
             self.download_window["-COMPLETED-"].update(
                 f"{download_counter} of {self.playlist.length}",  # type: ignore
             )
-        self.__download_complete()
+        self._download_complete()
 
-    def __download_complete(self) -> None:
+    def _download_complete(self) -> None:
         """Helper method that resets the download progressbar and notifies the user when the download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self.download_window["-COMPLETED-"].update("")  # type: ignore
@@ -284,8 +285,8 @@ class VideoDownloader(YouTubeDownloader):
         super().__init__(url)
         self.video: YouTube = YouTube(
             self.url,
-            on_progress_callback=self.__progress_check,
-            on_complete_callback=self.__on_complete,
+            on_progress_callback=self._progress_check,
+            on_complete_callback=self._on_complete,
         )
 
         # binding videos to corresponding download option
@@ -420,9 +421,7 @@ class VideoDownloader(YouTubeDownloader):
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
-                self.folder: str = (  # pylint: disable=attribute-defined-outside-init
-                    values["-FOLDER-"]
-                )
+                self.folder = values["-FOLDER-"]
             except TypeError:
                 break
 
@@ -460,11 +459,11 @@ class VideoDownloader(YouTubeDownloader):
         (
             self.select_dict[download_option].download(  # type: ignore
                 output_path=self.folder,
-                filename=f"{self.rename_file(self.folder, self.remove_forbidden_characters(self.video.title))}.mp4",
+                filename=f"{self.increment_file_name(self.folder, self.remove_forbidden_characters(self.video.title))}.mp4",
             )
         )
 
-    def __progress_check(
+    def _progress_check(
         self,
         stream: Any,
         chunk: bytes,  # pylint: disable=unused-argument
@@ -478,7 +477,7 @@ class VideoDownloader(YouTubeDownloader):
             f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",  # type: ignore
         )
 
-    def __on_complete(
+    def _on_complete(
         self,
         stream: Any,  # pylint: disable=unused-argument
         file_path: Optional[str],  # pylint: disable=unused-argument

@@ -27,15 +27,15 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def remove_forbidden_characters(name: str) -> str:
-        """Helper method that removes '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid an OSError.
+        """Helper method that removes '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string to avoid an OSError.
 
         :param str text: string
         :return str: string with removed forbidden characters
         """
-        return "".join(char for char in name if char not in r"\/:*?<>|")
+        return "".join(char for char in name if char not in r'"\/:*?<>|')
 
     @staticmethod
-    def rename_dir(root: Path | str, sub: Path | str) -> Path:
+    def increment_dir_name(root: Path | str, sub: Path | str) -> Path:
         """Helper method that renames the folder if the user download the playlist more than once.
 
         :param Path | str root: Path in which the playlist folder will be created
@@ -55,7 +55,7 @@ class YouTubeDownloader(ABC):
         return new_path
 
     @staticmethod
-    def rename_file(root: Path | str, file_name: str) -> str:
+    def increment_file_name(root: Path | str, file_name: str) -> str:
         """Helper method that renames the file if the user download the video more than once.
 
         :param Path | str root: Path in which the file will be downloaded

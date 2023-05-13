@@ -1,6 +1,6 @@
 [project]
 name = "YTDownloader"
-version = "1.4"
+version = "1.4.1"
 description = "A program to download any YouTube video or playlist"
 readme = "README.md"
 license = { text = "MIT" }

@@ -34,8 +34,6 @@ Note that ``pytube`` occasionally shows some issues with downloading playlists.
 
 ## Download
 
-You can find the realeses [here](https://github.com/realshouzy/YTDownloader/releases)
-
 - For Windows just download the executable [here](https://github.com/realshouzy/YTDownloader/releases)
 - For Linux or macOS download the source code, install the [requirements](requirements.txt) via pip and run the [main.py](scripts/main.py) in the scripts module as a file
 

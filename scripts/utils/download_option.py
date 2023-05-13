@@ -3,7 +3,7 @@
 """Module containing all a dataclass for the download option."""
 from __future__ import annotations
 
-from typing import NamedTuple, Optional
+from typing import Final, NamedTuple, Optional
 
 __all__: list[str] = ["DownloadOptions", "LD", "HD", "AUDIO"]
 
@@ -18,19 +18,19 @@ class DownloadOptions(NamedTuple):
 
 
 # defining download options
-LD: DownloadOptions = DownloadOptions(
+LD: Final[DownloadOptions] = DownloadOptions(
     resolution="360p",
     type="video",
     progressive=True,
     abr=None,
 )
-HD: DownloadOptions = DownloadOptions(
+HD: Final[DownloadOptions] = DownloadOptions(
     resolution="720p",
     type="video",
     progressive=True,
     abr=None,
 )
-AUDIO: DownloadOptions = DownloadOptions(
+AUDIO: Final[DownloadOptions] = DownloadOptions(
     resolution=None,
     type="audio",
     progressive=False,

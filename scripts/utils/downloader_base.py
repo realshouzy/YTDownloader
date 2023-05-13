@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import PySimpleGUI as sg
 
 if TYPE_CHECKING:
-    from .download_option import DownloadOption
+    from .download_option import DownloadOptions
 
 __all__: list[str] = ["YouTubeDownloader"]
 
@@ -73,7 +73,7 @@ class YouTubeDownloader(ABC):
         new_file_name: str = f"{file_name} ({i})"
         return new_file_name
 
-    # -------------------- defining popups
+    # defining popups
     @staticmethod
     def download_dir_popup() -> None:
         """Creates an info pop telling 'Please select a download directory.'"""
@@ -89,7 +89,7 @@ class YouTubeDownloader(ABC):
         """Method that creates the event loop for the download window."""
 
     @abstractmethod
-    def download(self, download_option: DownloadOption) -> None:
+    def download(self, download_option: DownloadOptions) -> None:
         """Helper method that downloads the YouTube content into the given directory.
 
         :param tuple option: tuple containing the download options

@@ -3,48 +3,30 @@
 """Main module."""
 from __future__ import annotations
 
-import re
+from typing import TYPE_CHECKING, Literal
 
 import PySimpleGUI as sg
 import pytube.exceptions
-from utils.downloader import PlaylistDownloader, VideoDownloader
-from utils.error_window import ErrorWindow
+
+from .utils.downloader import get_downloader
+from .utils.error_window import ErrorWindow
+
+if TYPE_CHECKING:
+    from .utils.downloader import PlaylistDownloader, VideoDownloader
 
 sg.theme("Darkred1")
 
 
-def get_valid_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
-    """Helper function that returns the appropriate YouTube downloader based on the given url.
-
-    :param str url: YouTube url
-    :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
-    """
-    youtube_playlist_pattern: re.Pattern[str] = re.compile(
-        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
-    )
-    youtube_video_pattern: re.Pattern[str] = re.compile(
-        r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?",
-    )
-
-    if re.search(youtube_playlist_pattern, url):
-        return PlaylistDownloader(url)
-    if re.search(youtube_video_pattern, url):
-        return VideoDownloader(url)
-    raise pytube.exceptions.RegexMatchError(
-        "get_valid_downloader",
-        "youtube_video_pattern or youtube_playlist_pattern",
-    )
-
-
-def main() -> None:
+def main() -> Literal[0, 1]:
     """Runs the program."""
-    # -------------------- defining layouts
+    # defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [
         [sg.Input(key="-LINKINPUT-"), sg.Button("Submit")],
     ]
     start_window: sg.Window = sg.Window("Youtube Downloader", start_layout)
+    exit_code: Literal[0, 1] = 0
 
-    # -------------------- main event loop
+    # main event loop
     while True:
         try:
             event, values = start_window.read()  # type: ignore
@@ -53,7 +35,7 @@ def main() -> None:
 
             if event == "Submit":
                 youtube_downloader: PlaylistDownloader | VideoDownloader = (
-                    get_valid_downloader(values["-LINKINPUT-"])
+                    get_downloader(values["-LINKINPUT-"])
                 )
                 youtube_downloader.create_window()
 
@@ -87,10 +69,12 @@ def main() -> None:
                 "Unexpected error\n"
                 f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
             ).create()
+            exit_code = 1
             break
 
     start_window.close()
+    return exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

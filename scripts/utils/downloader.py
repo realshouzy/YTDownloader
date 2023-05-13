@@ -3,20 +3,49 @@
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
 
+import re
 import webbrowser
 from multiprocessing.pool import ThreadPool
 from typing import TYPE_CHECKING, Any, Optional
 
 import PySimpleGUI as sg
-from pytube import Playlist, Stream, YouTube
+import pytube.exceptions
+from pytube import Playlist, YouTube
 
-from .download_option import AUDIO, HD, LD, DownloadOption
+from .download_option import AUDIO, HD, LD
 from .downloader_base import YouTubeDownloader
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-__all__: list[str] = ["PlaylistDownloader", "VideoDownloader"]
+    from pytube import Stream
+
+    from .download_option import DownloadOptions
+
+__all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
+
+
+def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
+    """Helper function that returns the appropriate YouTube downloader based on the given url.
+
+    :param str url: YouTube url
+    :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
+    """
+    youtube_playlist_pattern: re.Pattern[str] = re.compile(
+        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
+    )
+    youtube_video_pattern: re.Pattern[str] = re.compile(
+        r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?",
+    )
+
+    if re.match(youtube_playlist_pattern, url):
+        return PlaylistDownloader(url)
+    if re.match(youtube_video_pattern, url):
+        return VideoDownloader(url)
+    raise pytube.exceptions.RegexMatchError(
+        "get_downloader",
+        "youtube_video_pattern or youtube_playlist_pattern",
+    )
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -34,17 +63,17 @@ class PlaylistDownloader(YouTubeDownloader):
         super().__init__(url)
         self.playlist: Playlist = Playlist(self.url)
 
-        # -------------------- binding the playlists (list of streams) to corresponding download option
+        # binding the playlists (list of streams) to corresponding download option
         hd_list: list[Stream] = self.get_playlist(HD)
         ld_list: list[Stream] = self.get_playlist(LD)
         audio_list: list[Stream] = self.get_playlist(AUDIO)
-        self.select_dict: dict[DownloadOption, Optional[list[Stream]]] = {
+        self.select_dict: dict[DownloadOptions, Optional[list[Stream]]] = {
             HD: hd_list if None not in hd_list else None,
             LD: ld_list if None not in ld_list else None,
             AUDIO: audio_list if None not in audio_list else None,
         }
 
-        # -------------------- defining layouts
+        # defining layouts
         info_tab: list[list[sg.Text]] = [
             [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
             [sg.Text("Title:"), sg.Text(self.playlist.title)],
@@ -142,19 +171,19 @@ class PlaylistDownloader(YouTubeDownloader):
     @staticmethod
     def get_stream_from_video(
         video: YouTube,
-        download_option: DownloadOption,
+        download_option: DownloadOptions,
     ) -> Stream:
         """Returns the streams filtered according to the download options"""
         return video.streams.filter(
             resolution=download_option.resolution,
-            type=download_option.type_,
+            type=download_option.type,
             progressive=download_option.progressive,
             abr=download_option.abr,
         ).first()  # type: ignore
 
-    def get_playlist(self, download_option: DownloadOption) -> list[Stream]:
+    def get_playlist(self, download_option: DownloadOptions) -> list[Stream]:
         """Returns a list of the streams to the corresponding download option by using threads."""
-        args: tuple[tuple[YouTube, DownloadOption], ...] = tuple(
+        args: tuple[tuple[YouTube, DownloadOptions], ...] = tuple(
             zip(
                 self.playlist.videos,
                 (download_option,) * self.playlist.length,
@@ -169,14 +198,14 @@ class PlaylistDownloader(YouTubeDownloader):
             )
         return stream_list
 
-    def get_playlist_size(self, download_option: DownloadOption) -> str:
+    def get_playlist_size(self, download_option: DownloadOptions) -> str:
         """Returns the size of the playlist to the corresponding download option."""
         if self.select_dict[download_option] is None:
             return "Unavailable"
         return f"{round(sum(video.filesize for video in self.select_dict[download_option]) / 1048576, 1)} MB"  # type: ignore
 
     def create_window(self) -> None:
-        # -------------------- download window event loop
+        # download window event loop
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
@@ -206,7 +235,7 @@ class PlaylistDownloader(YouTubeDownloader):
 
         self.download_window.close()
 
-    def download(self, download_option: DownloadOption) -> None:
+    def download(self, download_option: DownloadOptions) -> None:
         if self.select_dict[download_option] is None:
             self.resolution_unavailable_popup()
             return
@@ -259,14 +288,14 @@ class VideoDownloader(YouTubeDownloader):
             on_complete_callback=self.__on_complete,
         )
 
-        # -------------------- binding videos to corresponding download option
-        self.select_dict: dict[DownloadOption, Optional[Stream]] = {
+        # binding videos to corresponding download option
+        self.select_dict: dict[DownloadOptions, Optional[Stream]] = {
             HD: self.get_video(HD),
             LD: self.get_video(LD),
             AUDIO: self.get_video(AUDIO),
         }
 
-        # -------------------- defining layouts
+        # defining layouts
         info_tab: list[list[sg.Text | sg.Multiline]] = [
             [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
             [sg.Text("Title:"), sg.Text(self.video.title)],
@@ -371,23 +400,23 @@ class VideoDownloader(YouTubeDownloader):
             modal=True,
         )
 
-    def get_video(self, download_option: DownloadOption) -> Optional[Stream]:
+    def get_video(self, download_option: DownloadOptions) -> Optional[Stream]:
         """Returns the stream to the corresponding download option."""
         return self.video.streams.filter(
             resolution=download_option.resolution,
-            type=download_option.type_,
+            type=download_option.type,
             progressive=download_option.progressive,
             abr=download_option.abr,
         ).first()
 
-    def get_video_size(self, download_option: DownloadOption) -> str:
+    def get_video_size(self, download_option: DownloadOptions) -> str:
         """Returns the size of the video to the corresponding download option."""
         if self.select_dict[download_option] is None:
             return "Unavailable"
         return f"{round(self.select_dict[download_option].filesize / 1048576, 1)} MB"  # type: ignore
 
     def create_window(self) -> None:
-        # -------------------- download window event loop
+        # download window event loop
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
@@ -420,7 +449,7 @@ class VideoDownloader(YouTubeDownloader):
 
         self.download_window.close()
 
-    def download(self, download_option: DownloadOption) -> None:
+    def download(self, download_option: DownloadOptions) -> None:
         if self.select_dict[download_option] is None:
             self.resolution_unavailable_popup()
             return

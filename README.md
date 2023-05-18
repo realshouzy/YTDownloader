@@ -50,7 +50,7 @@ The used libraries are:
 ```python
 # standard library
 import abc
-import multiprocessing.pool
+import concurrent.futures
 import pathlib
 import re
 import typing

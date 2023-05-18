@@ -3,7 +3,7 @@
 """Main module."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, TypeAlias
 
 import PySimpleGUI as sg
 import pytube.exceptions
@@ -13,17 +13,19 @@ from utils.error_window import ErrorWindow
 if TYPE_CHECKING:
     from utils.downloader import PlaylistDownloader, VideoDownloader
 
+_ExitCode: TypeAlias = Literal[0, 1]
+
 sg.theme("Darkred1")
 
 
-def main() -> Literal[0, 1]:
+def main() -> _ExitCode:
     """Runs the program."""
     # defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [
         [sg.Input(key="-LINKINPUT-"), sg.Button("Submit")],
     ]
     start_window: sg.Window = sg.Window("Youtube Downloader", start_layout)
-    exit_code: Literal[0, 1] = 0
+    exit_code: _ExitCode = 0
 
     # main event loop
     while True:

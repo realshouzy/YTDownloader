@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import PySimpleGUI as sg
 
 if TYPE_CHECKING:
-    from .download_option import DownloadOptions
+    from .download_options import DownloadOptions
 
 __all__: list[str] = ["YouTubeDownloader"]
 
@@ -89,7 +89,7 @@ class YouTubeDownloader(ABC):
         """Method that creates the event loop for the download window."""
 
     @abstractmethod
-    def download(self, download_option: DownloadOptions) -> None:
+    def download(self, download_options: DownloadOptions) -> None:
         """Helper method that downloads the YouTube content into the given directory.
 
         :param tuple option: tuple containing the download options

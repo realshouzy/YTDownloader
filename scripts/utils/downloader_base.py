@@ -5,11 +5,13 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import PySimpleGUI as sg
 
 if TYPE_CHECKING:
+    from pytube import Stream, YouTube
+
     from .download_options import DownloadOptions
 
 __all__: list[str] = ["YouTubeDownloader"]
@@ -72,6 +74,19 @@ class YouTubeDownloader(ABC):
 
         new_file_name: str = f"{file_name} ({i})"
         return new_file_name
+
+    @staticmethod
+    def get_stream_from_video(
+        video: YouTube,
+        download_options: DownloadOptions,
+    ) -> Optional[Stream]:
+        """Returns a stream filtered according to the download options."""
+        return video.streams.filter(
+            resolution=download_options.resolution,
+            type=download_options.type,
+            progressive=download_options.progressive,
+            abr=download_options.abr,
+        ).first()
 
     # defining popups
     @staticmethod

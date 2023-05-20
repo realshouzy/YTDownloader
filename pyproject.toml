@@ -21,13 +21,14 @@ line-length = 88
 profile = "black"
 
 [tool.mypy]
-strict = false
+strict = true
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 warn_redundant_casts = true
 ignore_missing_imports = true
+warn_unused_ignores = false
 
 [tool.ruff]
 extend-select = [
@@ -51,7 +52,7 @@ extend-select = [
     "G",
     "COM",
     "BLE",
-    "FBT"
+    "FBT",
 ]
 ignore = ["E501", "PLR0912", "BLE001", "FBT003", "ARG002", "INP001"]
 unfixable = []

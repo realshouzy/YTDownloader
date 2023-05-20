@@ -48,7 +48,7 @@ def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     )
 
 
-# pylint: disable=attribute-defined-outside-init
+# pylint: disable=attribute-defined-outside-init, unused-argument
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -446,7 +446,7 @@ class VideoDownloader(YouTubeDownloader):
     def _progress_check(
         self,
         stream: Any,
-        chunk: bytes,  # pylint: disable=unused-argument
+        chunk: bytes,
         bytes_remaining: int,
     ) -> None:  # parameters are necessary
         """Helper method that updated the progress bar when progress in the video download was made."""
@@ -459,8 +459,8 @@ class VideoDownloader(YouTubeDownloader):
 
     def _on_complete(
         self,
-        stream: Any,  # pylint: disable=unused-argument
-        file_path: Optional[str],  # pylint: disable=unused-argument
+        stream: Any,
+        file_path: Optional[str],
     ) -> None:  # parameters are necessary
         """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore

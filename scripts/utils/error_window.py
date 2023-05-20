@@ -30,7 +30,7 @@ class ErrorWindow:
 
     def create(self) -> None:
         """Method that creates the event loop for the error window."""
-        # -------------------- error window event loop
+        # error window event loop
         while True:
             event, _ = self.error_window.read()  # type: ignore
             if event in {sg.WIN_CLOSED, "-OK-"}:

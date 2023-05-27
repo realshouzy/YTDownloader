@@ -192,12 +192,13 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def get_playlist_size(self, download_options: DownloadOptions) -> str:
         """Returns the size of the playlist to the corresponding download option."""
-        if self.select_dict[download_options] is None:
+        stream_selections: Optional[list[Stream]] = self.select_dict[download_options]
+        if stream_selections is None:
             return "Unavailable"
-        return f"{round(sum(video.filesize for video in self.select_dict[download_options]) / 1048576, 1)} MB"  # type: ignore
+        return f"{round(sum(video.filesize for video in stream_selections) / 1048576, 1)} MB"
 
     def create_window(self) -> None:
-        # download window event loop
+        # download window event loops
         while True:
             event, values = self.download_window.read()  # type: ignore
             try:
@@ -392,9 +393,10 @@ class VideoDownloader(YouTubeDownloader):
 
     def get_video_size(self, download_options: DownloadOptions) -> str:
         """Returns the size of the video to the corresponding download option."""
-        if self.select_dict[download_options] is None:
+        stream_selection: Optional[Stream] = self.select_dict[download_options]
+        if stream_selection is None:
             return "Unavailable"
-        return f"{round(self.select_dict[download_options].filesize / 1048576, 1)} MB"  # type: ignore
+        return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 
     def create_window(self) -> None:
         # download window event loop

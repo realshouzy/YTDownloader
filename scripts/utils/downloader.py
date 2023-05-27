@@ -231,8 +231,7 @@ class PlaylistDownloader(YouTubeDownloader):
             self.download_dir_popup()
             return
 
-        streams_selection: Optional[list[Stream]] = self.select_dict[download_options]
-        if streams_selection is None:
+        if (streams_selection := self.select_dict[download_options]) is None:
             self.resolution_unavailable_popup()
             return
 
@@ -436,8 +435,7 @@ class VideoDownloader(YouTubeDownloader):
             self.download_dir_popup()
             return
 
-        stream_selection: Optional[Stream] = self.select_dict[download_options]
-        if stream_selection is None:
+        if (stream_selection := self.select_dict[download_options]) is None:
             self.resolution_unavailable_popup()
             return
 

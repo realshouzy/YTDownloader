@@ -227,12 +227,13 @@ class PlaylistDownloader(YouTubeDownloader):
         self.download_window.close()
 
     def download(self, download_options: DownloadOptions) -> None:
-        if self.select_dict[download_options] is None:
-            self.resolution_unavailable_popup()
-            return
-
         if not self.folder:
             self.download_dir_popup()
+            return
+
+        streams_selection: Optional[list[Stream]] = self.select_dict[download_options]
+        if streams_selection is None:
+            self.resolution_unavailable_popup()
             return
 
         download_dir: Path = self.increment_dir_name(
@@ -241,7 +242,7 @@ class PlaylistDownloader(YouTubeDownloader):
         )
 
         download_counter: int = 0
-        for video in self.select_dict[download_options]:  # type: ignore
+        for video in streams_selection:
             video.download(
                 output_path=str(download_dir),
                 filename=f"{self.remove_forbidden_characters(video.title)}.mp4",
@@ -431,18 +432,18 @@ class VideoDownloader(YouTubeDownloader):
         self.download_window.close()
 
     def download(self, download_options: DownloadOptions) -> None:
-        if self.select_dict[download_options] is None:
-            self.resolution_unavailable_popup()
-            return
-
         if not self.folder:
             self.download_dir_popup()
             return
-        (
-            self.select_dict[download_options].download(  # type: ignore
-                output_path=self.folder,
-                filename=f"{self.increment_file_name(self.folder, self.remove_forbidden_characters(self.video.title))}.mp4",
-            )
+
+        stream_selection: Optional[Stream] = self.select_dict[download_options]
+        if stream_selection is None:
+            self.resolution_unavailable_popup()
+            return
+
+        stream_selection.download(
+            output_path=self.folder,
+            filename=f"{self.increment_file_name(self.folder, self.remove_forbidden_characters(self.video.title))}.mp4",
         )
 
     def _progress_check(
@@ -467,5 +468,4 @@ class VideoDownloader(YouTubeDownloader):
         """Helper method that resets the progress bar when the video download has finished."""
         self.download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self.download_window["-COMPLETED-"].update("")  # type: ignore
-        sg.Popup("Download completed")
-        sg.Popup("Download completed")
+        sg.Popup(f"Downloaded to {file_path!r}")

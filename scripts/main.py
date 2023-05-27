@@ -8,10 +8,12 @@ from typing import TYPE_CHECKING, Literal, TypeAlias
 import PySimpleGUI as sg
 import pytube.exceptions
 from utils.downloader import get_downloader
-from utils.error_window import ErrorWindow
+from utils.error_window import create_error_window
 
 if TYPE_CHECKING:
     from utils.downloader import PlaylistDownloader, VideoDownloader
+
+__all__: list[str] = ["main"]
 
 _ExitCode: TypeAlias = Literal[0, 1]
 
@@ -42,34 +44,34 @@ def main() -> _ExitCode:
 
         except pytube.exceptions.RegexMatchError as rmx:
             if not values["-LINKINPUT-"]:  # type: ignore
-                ErrorWindow(rmx, "Please provide link.").create()
+                create_error_window(rmx, "Please provide link.")
             else:
-                ErrorWindow(rmx, "Invalid link.").create()
+                create_error_window(rmx, "Invalid link.")
 
         except pytube.exceptions.VideoPrivate as vpx:
-            ErrorWindow(vpx, "Video is privat.").create()
+            create_error_window(vpx, "Video is privat.")
 
         except pytube.exceptions.MembersOnly as mox:
-            ErrorWindow(mox, "Video is for members only.").create()
+            create_error_window(mox, "Video is for members only.")
 
         except pytube.exceptions.VideoRegionBlocked as vgbx:
-            ErrorWindow(vgbx, "Video is block in your region.").create()
+            create_error_window(vgbx, "Video is block in your region.")
 
         except pytube.exceptions.VideoUnavailable as vux:
-            ErrorWindow(vux, "Video Unavailable.").create()
+            create_error_window(vux, "Video Unavailable.")
 
         except KeyError as key_exce:
-            ErrorWindow(
+            create_error_window(
                 key_exce,
                 "Video or playlist is unreachable or invalid.",
-            ).create()
+            )
 
         except Exception as exce:  # pylint: disable=broad-exception-caught
-            ErrorWindow(
+            create_error_window(
                 exce,
                 "Unexpected error\n"
                 f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
-            ).create()
+            )
             exit_code = 1
             break
 

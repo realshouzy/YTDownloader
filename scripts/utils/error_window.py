@@ -10,10 +10,10 @@ import PySimpleGUI as sg
 __all__: list[str] = ["create_error_window"]
 
 
-def create_error_window(error: Exception, message: str) -> None:
+def create_error_window(error_name: str, message: str) -> None:
     """Creates an error window."""
     error_layout: list[list[sg.Text | sg.Button]] = [
-        [sg.Text(f"{error.__class__.__name__}: {message}")],
+        [sg.Text(f"{error_name}: {message}")],
         [sg.Button("Ok", key="-OK-"), sg.Button("Report", key="-REPORT-")],
     ]
 

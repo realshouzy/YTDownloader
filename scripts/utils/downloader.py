@@ -192,8 +192,7 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def get_playlist_size(self, download_options: DownloadOptions) -> str:
         """Returns the size of the playlist to the corresponding download option."""
-        stream_selections: Optional[list[Stream]] = self.select_dict[download_options]
-        if stream_selections is None:
+        if (stream_selections := self.select_dict[download_options]) is None:
             return "Unavailable"
         return f"{round(sum(video.filesize for video in stream_selections) / 1048576, 1)} MB"
 
@@ -393,8 +392,7 @@ class VideoDownloader(YouTubeDownloader):
 
     def get_video_size(self, download_options: DownloadOptions) -> str:
         """Returns the size of the video to the corresponding download option."""
-        stream_selection: Optional[Stream] = self.select_dict[download_options]
-        if stream_selection is None:
+        if (stream_selection := self.select_dict[download_options]) is None:
             return "Unavailable"
         return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 

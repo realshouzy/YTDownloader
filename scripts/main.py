@@ -42,35 +42,37 @@ def main() -> _ExitCode:
                 )
                 youtube_downloader.create_window()
 
-        except pytube.exceptions.RegexMatchError as rmx:
+        except pytube.exceptions.RegexMatchError as re_err:
             if not values["-LINKINPUT-"]:  # type: ignore
-                create_error_window(rmx, "Please provide link.")
+                create_error_window(re_err.__class__.__name__, "Please provide link.")
             else:
-                create_error_window(rmx, "Invalid link.")
+                create_error_window(re_err.__class__.__name__, "Invalid link.")
 
-        except pytube.exceptions.VideoPrivate as vpx:
-            create_error_window(vpx, "Video is privat.")
+        except pytube.exceptions.VideoPrivate as vp_err:
+            create_error_window(vp_err.__class__.__name__, "Video is privat.")
 
         except pytube.exceptions.MembersOnly as mox:
-            create_error_window(mox, "Video is for members only.")
+            create_error_window(mox.__class__.__name__, "Video is for members only.")
 
-        except pytube.exceptions.VideoRegionBlocked as vgbx:
-            create_error_window(vgbx, "Video is block in your region.")
-
-        except pytube.exceptions.VideoUnavailable as vux:
-            create_error_window(vux, "Video Unavailable.")
-
-        except KeyError as key_exce:
+        except pytube.exceptions.VideoRegionBlocked as vgb_err:
             create_error_window(
-                key_exce,
+                vgb_err.__class__.__name__,
+                "Video is block in your region.",
+            )
+
+        except pytube.exceptions.VideoUnavailable as vu_err:
+            create_error_window(vu_err.__class__.__name__, "Video Unavailable.")
+
+        except KeyError as key_err:
+            create_error_window(
+                key_err.__class__.__name__,
                 "Video or playlist is unreachable or invalid.",
             )
 
-        except Exception as exce:  # pylint: disable=broad-exception-caught
+        except Exception as err:  # pylint: disable=broad-exception-caught
             create_error_window(
-                exce,
-                "Unexpected error\n"
-                f"{exce.__class__.__name__} at line {exce.__traceback__.tb_lineno} of {__file__}: {exce}",  # type: ignore
+                err.__class__.__name__,
+                str(err),
             )
             exit_code = 1
             break

@@ -22,12 +22,13 @@ sg.theme("Darkred1")
 
 def main() -> _ExitCode:
     """Runs the program."""
+    exit_code: _ExitCode = 0
+
     # defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [
         [sg.Input(key="-LINKINPUT-"), sg.Button("Submit")],
     ]
     start_window: sg.Window = sg.Window("Youtube Downloader", start_layout)
-    exit_code: _ExitCode = 0
 
     # main event loop
     while True:
@@ -51,8 +52,8 @@ def main() -> _ExitCode:
         except pytube.exceptions.VideoPrivate as vp_err:
             create_error_window(vp_err.__class__.__name__, "Video is privat.")
 
-        except pytube.exceptions.MembersOnly as mox:
-            create_error_window(mox.__class__.__name__, "Video is for members only.")
+        except pytube.exceptions.MembersOnly as mo_err:
+            create_error_window(mo_err.__class__.__name__, "Video is for members only.")
 
         except pytube.exceptions.VideoRegionBlocked as vgb_err:
             create_error_window(

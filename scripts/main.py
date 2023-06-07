@@ -23,7 +23,7 @@ _EXIT_FAILURE: Final[Literal[1]] = 1
 sg.theme("Darkred1")
 
 
-def main() -> _ExitCode:
+def main() -> _ExitCode:  # pylint: disable=too-many-branches
     """Runs the program."""
     exit_code: _ExitCode = _EXIT_SUCCESS
 
@@ -62,6 +62,18 @@ def main() -> _ExitCode:
             create_error_window(
                 vgb_err.__class__.__name__,
                 "Video is block in your region.",
+            )
+
+        except pytube.exceptions.LiveStreamError as ls_err:
+            create_error_window(
+                ls_err.__class__.__name__,
+                "This is an active life stream.",
+            )
+
+        except pytube.exceptions.AgeRestrictedError as ar_err:
+            create_error_window(
+                ar_err.__class__.__name__,
+                "This video is age restricted.",
             )
 
         except pytube.exceptions.VideoUnavailable as vu_err:

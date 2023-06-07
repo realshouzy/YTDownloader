@@ -21,7 +21,7 @@ class YouTubeDownloader(ABC):
     """Abstract class that defines the most important needed (abstract) methods."""
 
     def __init__(self, url: str) -> None:
-        self._url: str = url
+        self._url: str = url if url.startswith("https://") else f"https://{url}"
 
     @property
     def url(self) -> str:

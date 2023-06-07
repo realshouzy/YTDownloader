@@ -29,7 +29,7 @@ _YOUTUBE_PLAYLIST_PATTERN: re.Pattern[str] = re.compile(
     r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",  # pylint: disable=line-too-long
 )
 _YOUTUBE_VIDEO_PATTERN: re.Pattern[str] = re.compile(
-    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?", # pylint: disable=line-too-long
+    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?",  # pylint: disable=line-too-long
 )
 
 
@@ -488,4 +488,4 @@ class VideoDownloader(YouTubeDownloader):
         """Helper method that resets the progress bar when the video download has finished."""
         self._download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self._download_window["-COMPLETED-"].update("")  # type: ignore
-        sg.Popup(f"Downloaded to {file_path!r}")
+        sg.Popup("Downloaded complete")

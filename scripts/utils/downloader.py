@@ -29,7 +29,7 @@ _YOUTUBE_PLAYLIST_PATTERN: re.Pattern[str] = re.compile(
     r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",  # pylint: disable=line-too-long
 )
 _YOUTUBE_VIDEO_PATTERN: re.Pattern[str] = re.compile(
-    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?",  # pylint: disable=line-too-long
+    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?", # pylint: disable=line-too-long
 )
 
 
@@ -203,7 +203,7 @@ class PlaylistDownloader(YouTubeDownloader):
         """Returns the size of the playlist to the corresponding download option."""
         if (stream_selections := self._stream_selection[download_options]) is None:
             return "Unavailable"
-        return f"{sum(video.filesize for video in stream_selections) / 1048576:.1} MB"
+        return f"{round(sum(video.filesize for video in stream_selections) / 1048576, 1)} MB"
 
     def create_window(self) -> None:
         # download window event loops
@@ -413,7 +413,7 @@ class VideoDownloader(YouTubeDownloader):
         """Returns the size of the video to the corresponding download option."""
         if (stream_selection := self._stream_selection[download_options]) is None:
             return "Unavailable"
-        return f"{stream_selection.filesize / 1048576:.1} MB"
+        return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 
     def create_window(self) -> None:
         # download window event loop

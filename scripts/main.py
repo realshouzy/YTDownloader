@@ -3,7 +3,7 @@
 """Main module."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, TypeAlias
+from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 import PySimpleGUI as sg
 import pytube.exceptions
@@ -17,12 +17,15 @@ __all__: list[str] = ["main"]
 
 _ExitCode: TypeAlias = Literal[0, 1]
 
+_EXIT_SUCCESS: Final[Literal[0]] = 0
+_EXIT_FAILURE: Final[Literal[1]] = 1
+
 sg.theme("Darkred1")
 
 
 def main() -> _ExitCode:
     """Runs the program."""
-    exit_code: _ExitCode = 0
+    exit_code: _ExitCode = _EXIT_SUCCESS
 
     # defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [
@@ -75,7 +78,7 @@ def main() -> _ExitCode:
                 err.__class__.__name__,
                 str(err),
             )
-            exit_code = 1
+            exit_code = _EXIT_FAILURE
             break
 
     start_window.close()

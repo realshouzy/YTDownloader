@@ -21,7 +21,12 @@ class YouTubeDownloader(ABC):
     """Abstract class that defines the most important needed (abstract) methods."""
 
     def __init__(self, url: str) -> None:
-        self.url: str = url
+        self._url: str = url
+
+    @property
+    def url(self) -> str:
+        """The YouTube URL."""
+        return self._url
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(url={self.url})"

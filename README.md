@@ -25,7 +25,7 @@
 
 ## Info
 
-This project is mostly finished and technical archived, meaning I probably won't add any new features. Although, if necessary, I will fix bugs.
+This project is mostly finished and technically archived, meaning I probably won't add any new features. Although, if necessary, I will fix bugs and other issues.
 Additionally, if someone wants to contribute to this project, any [pull request](https://github.com/realshouzy/YTDownloader/pulls) is welcome.
 
 ## Disclaimer

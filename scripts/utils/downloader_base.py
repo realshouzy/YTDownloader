@@ -3,6 +3,8 @@
 """Module containing the base class for the YouTube downloader."""
 from __future__ import annotations
 
+__all__: list[str] = ["YouTubeDownloader"]
+
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
@@ -13,8 +15,6 @@ if TYPE_CHECKING:
     from pytube import Stream, YouTube
 
     from .download_options import DownloadOptions
-
-__all__: list[str] = ["YouTubeDownloader"]
 
 
 class YouTubeDownloader(ABC):

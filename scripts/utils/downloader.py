@@ -3,6 +3,8 @@
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
 
+__all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
+
 import re
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
@@ -21,8 +23,6 @@ if TYPE_CHECKING:
     from pytube import Stream
 
     from .download_options import DownloadOptions
-
-__all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
 
 
 _YOUTUBE_PLAYLIST_PATTERN: re.Pattern[str] = re.compile(

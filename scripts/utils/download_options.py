@@ -3,9 +3,9 @@
 """Module containing all a dataclass for the download option."""
 from __future__ import annotations
 
-from typing import Final, NamedTuple, Optional
-
 __all__: list[str] = ["DownloadOptions", "LD", "HD", "AUDIO"]
+
+from typing import Final, NamedTuple, Optional
 
 
 class DownloadOptions(NamedTuple):

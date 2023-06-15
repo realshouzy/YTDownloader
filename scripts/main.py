@@ -3,6 +3,8 @@
 """Main module."""
 from __future__ import annotations
 
+__all__: list[str] = ["main"]
+
 from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 import PySimpleGUI as sg
@@ -12,8 +14,6 @@ from utils.error_window import create_error_window
 
 if TYPE_CHECKING:
     from utils.downloader import PlaylistDownloader, VideoDownloader
-
-__all__: list[str] = ["main"]
 
 _ExitCode: TypeAlias = Literal[0, 1]
 

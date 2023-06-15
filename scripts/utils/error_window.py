@@ -3,11 +3,11 @@
 """Module containing the class to create a error window."""
 from __future__ import annotations
 
+__all__: list[str] = ["create_error_window"]
+
 import webbrowser
 
 import PySimpleGUI as sg
-
-__all__: list[str] = ["create_error_window"]
 
 
 def create_error_window(error_name: str, message: str) -> None:

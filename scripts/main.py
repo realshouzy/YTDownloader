@@ -48,7 +48,10 @@ def main() -> _ExitCode:  # pylint: disable=too-many-branches
 
         except pytube.exceptions.RegexMatchError as re_err:
             if not values["-LINKINPUT-"]:  # type: ignore
-                create_error_window(re_err.__class__.__name__, "Please provide link.")
+                create_error_window(
+                    re_err.__class__.__name__,
+                    "Please provide link.",
+                )
             else:
                 create_error_window(re_err.__class__.__name__, "Invalid link.")
 

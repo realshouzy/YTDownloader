@@ -8,7 +8,7 @@ __all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
 import re
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Iterator, Optional
 
 import PySimpleGUI as sg
 import pytube.exceptions
@@ -182,17 +182,14 @@ class PlaylistDownloader(YouTubeDownloader):
         download_options: DownloadOptions,
     ) -> list[Optional[Stream]]:
         """Returns a list of the streams to the corresponding download option by using threads."""
-        args: zip[tuple[YouTube, DownloadOptions]] = zip(
-            self.playlist.videos,
-            (download_options,) * self.playlist.length,
-            strict=True,
-        )
-
         with ThreadPoolExecutor() as executor:
             stream_list: list[Optional[Stream]] = list(
                 executor.map(
-                    lambda args: self._get_stream_from_video(*args),
-                    args,
+                    lambda stream: self._get_stream_from_video(
+                        stream,
+                        download_options,
+                    ),
+                    self.playlist.videos,
                 ),
             )
         return stream_list
@@ -201,7 +198,13 @@ class PlaylistDownloader(YouTubeDownloader):
         """Returns the size of the playlist to the corresponding download option."""
         if (stream_selections := self._stream_selection[download_options]) is None:
             return "Unavailable"
-        return f"{round(sum(video.filesize for video in stream_selections) / 1048576, 1)} MB"
+
+        with ThreadPoolExecutor() as executor:
+            stream_sizes: Iterator[int] = executor.map(
+                lambda stream: stream.filesize,
+                stream_selections,
+            )
+        return f"{round(sum(stream_sizes) / 1048576, 1)} MB"
 
     def create_window(self) -> None:
         # download window event loops

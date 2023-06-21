@@ -9,7 +9,7 @@ from typing import Final, NamedTuple, Optional
 
 
 class DownloadOptions(NamedTuple):
-    """Class that defines and contains the download options."""
+    """Tuple-like class that defines and contains the download options."""
 
     resolution: Optional[str]
     type: str  # noqa: A003

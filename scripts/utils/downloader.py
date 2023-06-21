@@ -182,12 +182,10 @@ class PlaylistDownloader(YouTubeDownloader):
         download_options: DownloadOptions,
     ) -> list[Optional[Stream]]:
         """Returns a list of the streams to the corresponding download option by using threads."""
-        args: tuple[tuple[YouTube, DownloadOptions], ...] = tuple(
-            zip(
-                self.playlist.videos,
-                (download_options,) * self.playlist.length,
-                strict=True,
-            ),
+        args: zip[tuple[YouTube, DownloadOptions]] = zip(
+            self.playlist.videos,
+            (download_options,) * self.playlist.length,
+            strict=True,
         )
 
         with ThreadPoolExecutor() as executor:

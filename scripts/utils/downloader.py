@@ -8,7 +8,7 @@ __all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
 import re
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import PySimpleGUI as sg
 import pytube.exceptions
@@ -25,10 +25,10 @@ if TYPE_CHECKING:
     from .download_options import DownloadOptions
 
 
-_YOUTUBE_PLAYLIST_PATTERN: re.Pattern[str] = re.compile(
+_YOUTUBE_PLAYLIST_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",  # pylint: disable=line-too-long
 )
-_YOUTUBE_VIDEO_PATTERN: re.Pattern[str] = re.compile(
+_YOUTUBE_VIDEO_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?",  # pylint: disable=line-too-long
 )
 

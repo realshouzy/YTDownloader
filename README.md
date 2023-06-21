@@ -47,8 +47,6 @@ Note that ``pytube`` occasionally shows some issues with downloading playlists.
 
 (If you want the latest version, download the source code directly as releases can be delayed.)
 
-<br />
-
 ## Running the Program
 
 ### Requirements

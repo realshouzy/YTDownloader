@@ -89,10 +89,7 @@ def main() -> _ExitCode:  # pylint: disable=too-many-branches
             )
 
         except Exception as err:  # pylint: disable=broad-exception-caught
-            create_error_window(
-                err.__class__.__name__,
-                str(err),
-            )
+            create_error_window(err.__class__.__name__, str(err))
             exit_code = _EXIT_FAILURE
             break
 

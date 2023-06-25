@@ -44,8 +44,8 @@ def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     if re.fullmatch(_YOUTUBE_VIDEO_PATTERN, url):
         return VideoDownloader(url)
     raise pytube.exceptions.RegexMatchError(
-        "get_downloader",
-        "youtube_video_pattern or youtube_playlist_pattern",
+        get_downloader.__name__,
+        "_YOUTUBE_PLAYLIST_PATTERN | _YOUTUBE_VIDEO_PATTERN",
     )
 
 
@@ -254,10 +254,7 @@ class PlaylistDownloader(YouTubeDownloader):
             clean_filename: str = (
                 f"{self._remove_forbidden_characters(video.title)}.mp4"
             )
-            video.download(
-                output_path=str(download_path),
-                filename=clean_filename,
-            )
+            video.download(output_path=str(download_path), filename=clean_filename)
             download_counter += 1
             self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)  # type: ignore
             self._download_window["-COMPLETED-"].update(
@@ -462,17 +459,9 @@ class VideoDownloader(YouTubeDownloader):
             f"{self._increment_file_name(self._download_folder, clean_video_title)}.mp4"
         )
 
-        stream_selection.download(
-            output_path=self._download_folder,
-            filename=file_path,
-        )
+        stream_selection.download(output_path=self._download_folder, filename=file_path)
 
-    def _progress_check(
-        self,
-        stream: Any,
-        chunk: bytes,
-        bytes_remaining: int,
-    ) -> None:  # parameters are necessary
+    def _progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
         """Helper method that updated the progress bar when progress in the download was made."""
         self._download_window["-DOWNLOADPROGRESS-"].update(
             100 - round(bytes_remaining / stream.filesize * 100),  # type: ignore
@@ -481,11 +470,7 @@ class VideoDownloader(YouTubeDownloader):
             f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",  # type: ignore
         )
 
-    def _on_complete(
-        self,
-        stream: Any,
-        file_path: Optional[str],
-    ) -> None:  # parameters are necessary
+    def _on_complete(self, stream: Any, file_path: Optional[str]) -> None:
         """Helper method that resets the progress bar when the video download has finished."""
         self._download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
         self._download_window["-COMPLETED-"].update("")  # type: ignore

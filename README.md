@@ -17,6 +17,7 @@
 [![Release Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)
 [![Code Size](https://img.shields.io/github/languages/code-size/realshouzy/YTDownloader)](https://github.com/realshouzy/YTDownloader)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
+[![Python 3.10](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/realshouzy/YTDownloader/blob/main/LICENSE)
 
 </div>
@@ -34,7 +35,7 @@ This concept is **not** my idea. I was inspired by **[Clear Code]** from this **
 I took the liberty to add some features, such as downloading playlists, selecting a download directory and other adjustments and improvements.
 You can find the orignial code [here](https://pastebin.com/gRtcAv5c).
 
-The [icon](assets/YTdownloader.ico) can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUWH1MDX6wkgY4psWSZt5BzY4/rs:fit:512:512:1/g:ce/aHR0cHM6Ly9jZG4u/aWNvbi1pY29ucy5j/b20vaWNvbnMyLzEz/ODEvUE5HLzUxMi95/b3V0dWJlZGxfOTM1/MjkucG5n).
+The [icon](assets/YTDownloader.ico) can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUWH1MDX6wkgY4psWSZt5BzY4/rs:fit:512:512:1/g:ce/aHR0cHM6Ly9jZG4u/aWNvbi1pY29ucy5j/b20vaWNvbnMyLzEz/ODEvUE5HLzUxMi95/b3V0dWJlZGxfOTM1/MjkucG5n).
 
 **WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!**
 

@@ -24,6 +24,8 @@
 
 <br />
 
+## Currently it appears that ``pytube==15.0.0`` has an [issue](https://github.com/pytube/pytube/issues/1713) which makes it throw an ``RegexMatchError`` and thus for now unuseable!
+
 ## Info
 
 This project is mostly finished and technically archived, meaning I probably won't add any new features. Although, if necessary, I will fix bugs and other issues.

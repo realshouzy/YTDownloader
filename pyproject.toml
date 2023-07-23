@@ -68,6 +68,7 @@ target-version = "py311"
 line-length = 88
 
 [tool.ruff.isort]
+known-first-party = ["YTDownloader"]
 required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.pydocstyle]

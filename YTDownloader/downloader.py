@@ -13,8 +13,8 @@ import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
 
-from .download_options import AUDIO, HD, LD
-from .downloader_base import YouTubeDownloader
+from YTDownloader.download_options import AUDIO, HD, LD
+from YTDownloader.downloader_base import YouTubeDownloader
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

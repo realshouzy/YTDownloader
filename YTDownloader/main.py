@@ -4,7 +4,7 @@ from __future__ import annotations
 
 __all__: list[str] = ["main"]
 
-from typing import TYPE_CHECKING, Final, Literal, TypeAlias
+from typing import TYPE_CHECKING, Final, Literal
 
 import PySimpleGUI as sg
 import pytube.exceptions
@@ -15,17 +15,15 @@ from YTDownloader.error_window import create_error_window
 if TYPE_CHECKING:
     from YTDownloader.downloader import PlaylistDownloader, VideoDownloader
 
-_ExitCode: TypeAlias = Literal[0, 1]
-
 _EXIT_SUCCESS: Final[Literal[0]] = 0
 _EXIT_FAILURE: Final[Literal[1]] = 1
 
 sg.theme("Darkred1")
 
 
-def main() -> _ExitCode:  # pylint: disable=R0912 # noqa: C901
+def main() -> int:  # pylint: disable=R0912 # noqa: C901
     """Run the program."""
-    exit_code: _ExitCode = _EXIT_SUCCESS
+    exit_code: int = _EXIT_SUCCESS
 
     # defining layouts
     start_layout: list[list[sg.Input | sg.Button]] = [

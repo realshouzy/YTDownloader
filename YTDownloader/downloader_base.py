@@ -4,7 +4,6 @@ from __future__ import annotations
 __all__: list[str] = ["YouTubeDownloader"]
 
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import PySimpleGUI as sg
@@ -30,42 +29,6 @@ class YouTubeDownloader(ABC):
         return f"{self.__class__.__name__}(url={self.url!r})"
 
     @staticmethod
-    def _remove_forbidden_characters(name: str) -> str:
-        r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
-
-        This avoids an OSError.
-        """
-        return "".join(char for char in name if char not in r'"\/:*?<>|')
-
-    @staticmethod
-    def _increment_dir_name(root: Path | str, sub: Path | str) -> Path:
-        """Increment the directory if the user downloads a playlist more than once."""
-        original_path: Path = Path(f"{root}/{sub}")
-        if not original_path.exists():
-            return original_path
-
-        i: int = 1
-        while Path(f"{root}/{sub} ({i})").exists():
-            i += 1
-
-        new_path: Path = Path(f"{root}/{sub} ({i})")
-        return new_path
-
-    @staticmethod
-    def _increment_file_name(root: Path | str, file_name: str) -> str:
-        """Increment the file if the user downloads a video more than once."""
-        file_path: Path = Path(f"{root}/{file_name}.mp4")
-        if not file_path.exists():
-            return file_name
-
-        i: int = 1
-        while Path(f"{root}/{file_name} ({i}).mp4").exists():
-            i += 1
-
-        new_file_name: str = f"{file_name} ({i})"
-        return new_file_name
-
-    @staticmethod
     def _get_stream_from_video(
         video: YouTube,
         download_options: DownloadOptions,
@@ -78,7 +41,6 @@ class YouTubeDownloader(ABC):
             abr=download_options.abr,
         ).first()
 
-    # defining popups
     @staticmethod
     def _download_dir_popup() -> None:
         """Create an info pop telling 'Please select a download directory.'."""

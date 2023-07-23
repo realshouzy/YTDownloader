@@ -6,6 +6,7 @@ __all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
 import re
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final
 
 import PySimpleGUI as sg
@@ -17,7 +18,6 @@ from .downloader_base import YouTubeDownloader
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pathlib import Path
 
     from pytube import Stream
 
@@ -46,6 +46,42 @@ def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
         get_downloader.__name__,
         "_YOUTUBE_PLAYLIST_PATTERN | _YOUTUBE_VIDEO_PATTERN",
     )
+
+
+def _remove_forbidden_characters(name: str) -> str:
+    r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+
+    This avoids an OSError.
+    """
+    return "".join(char for char in name if char not in r'"\/:*?<>|')
+
+
+def _increment_playlist_dir_name(root: Path | str, sub: Path | str) -> Path:
+    """Increment the directory if the user downloads a playlist more than once."""
+    original_path: Path = Path(f"{root}/{sub}")
+    if not original_path.exists():
+        return original_path
+
+    i: int = 1
+    while Path(f"{root}/{sub} ({i})").exists():
+        i += 1
+
+    new_path: Path = Path(f"{root}/{sub} ({i})")
+    return new_path
+
+
+def _increment_video_file_name(root: Path | str, file_name: str) -> str:
+    """Increment the file if the user downloads a video more than once."""
+    file_path: Path = Path(f"{root}/{file_name}.mp4")
+    if not file_path.exists():
+        return file_name
+
+    i: int = 1
+    while Path(f"{root}/{file_name} ({i}).mp4").exists():
+        i += 1
+
+    new_file_name: str = f"{file_name} ({i})"
+    return new_file_name
 
 
 # pylint: disable=attribute-defined-outside-init, unused-argument
@@ -243,17 +279,15 @@ class PlaylistDownloader(YouTubeDownloader):
             self._resolution_unavailable_popup()
             return
 
-        download_path: Path = self._increment_dir_name(
+        download_path: Path = _increment_playlist_dir_name(
             self._download_folder,
-            self._remove_forbidden_characters(self.playlist.title),
+            _remove_forbidden_characters(self.playlist.title),
         )
 
         download_counter: int = 0
         for video in streams_selection:
-            clean_filename: str = (
-                f"{self._remove_forbidden_characters(video.title)}.mp4"
-            )
-            video.download(output_path=str(download_path), filename=clean_filename)
+            clean_filename: str = f"{_remove_forbidden_characters(video.title)}.mp4"
+            video.download(output_path=str(download_path), filename=clean_filename)  # type: ignore
             download_counter += 1
             self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)  # type: ignore
             self._download_window["-COMPLETED-"].update(
@@ -451,10 +485,8 @@ class VideoDownloader(YouTubeDownloader):
             self._resolution_unavailable_popup()
             return
 
-        clean_video_title: str = self._remove_forbidden_characters(self.video.title)
-        file_path: str = (
-            f"{self._increment_file_name(self._download_folder, clean_video_title)}.mp4"
-        )
+        clean_video_title: str = _remove_forbidden_characters(self.video.title)
+        file_path: str = f"{_increment_video_file_name(self._download_folder, clean_video_title)}.mp4"  # pylint: disable=C0301
 
         stream_selection.download(output_path=self._download_folder, filename=file_path)
 

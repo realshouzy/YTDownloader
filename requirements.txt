@@ -1,2 +1,2 @@
-PySimpleGUI
-pytube
+PySimpleGUI>=4.60.5
+pytube>=15.0.0

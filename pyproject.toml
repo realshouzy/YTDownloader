@@ -1,8 +1,6 @@
 [project]
 name = "YTDownloader"
-version = "1.5.1"
 description = "A program to download any YouTube video or playlist"
-readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "realshouzy" }]
 classifiers = [
@@ -14,9 +12,15 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython"
 ]
 requires-python = ">=3.10"
-dependencies = ["pytube", "PySimpleGUI"]
+dynamic = ["version", "readme", "dependencies"]
+
+[tool.setuptools.dynamic]
+version = {attr = "auto_file_sorter.__version__"}
+readme = {file = ["README.md"]}
+dependencies = {file = "requirements.txt"}
 
 [tool.black]
+target-version = ["py311", "py310"]
 line-length = 88
 
 [tool.isort]
@@ -41,34 +45,33 @@ no_implicit_optional = true
 warn_unused_ignores = false
 
 [tool.ruff]
-extend-select = [
-    "F", 
-    "A", 
-    "B", 
-    "INP", 
-    "I", 
-    "PYI", 
-    "RSE", 
-    "RET", 
-    "Q", 
-    "SLF", 
-    "SIM", 
-    "TID", 
-    "TCH", 
-    "ARG", 
-    "PL", 
-    "RUF",
-    "C4",
-    "G",
-    "COM",
-    "BLE",
-    "FBT",
+select = ["ALL"]
+ignore = [
+    "E501",
+    "PLR0912",
+    "BLE001",
+    "FBT003",
+    "ARG002",
+    "INP001",
+    "N813",
+    "PGH003",
+    "D107",
+    "ANN101",
+    "ANN401",
+    "D105",
+    "N999",
 ]
-ignore = ["E501", "PLR0912", "BLE001", "FBT003", "ARG002", "INP001"]
 unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 show-fixes = true
 target-version = "py311"
+line-length = 88
+
+[tool.ruff.isort]
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.pydocstyle]
 convention = "pep257"
+
+[tool.pylint]
+disable = ["C0103"]

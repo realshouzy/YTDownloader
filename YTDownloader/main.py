@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 """Main module."""
 from __future__ import annotations
 
@@ -9,11 +8,12 @@ from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 import PySimpleGUI as sg
 import pytube.exceptions
-from utils.downloader import get_downloader
-from utils.error_window import create_error_window
+
+from YTDownloader.downloader import get_downloader
+from YTDownloader.error_window import create_error_window
 
 if TYPE_CHECKING:
-    from utils.downloader import PlaylistDownloader, VideoDownloader
+    from YTDownloader.downloader import PlaylistDownloader, VideoDownloader
 
 _ExitCode: TypeAlias = Literal[0, 1]
 
@@ -23,8 +23,8 @@ _EXIT_FAILURE: Final[Literal[1]] = 1
 sg.theme("Darkred1")
 
 
-def main() -> _ExitCode:  # pylint: disable=too-many-branches
-    """Runs the program."""
+def main() -> _ExitCode:  # pylint: disable=R0912 # noqa: C901
+    """Run the program."""
     exit_code: _ExitCode = _EXIT_SUCCESS
 
     # defining layouts
@@ -88,7 +88,7 @@ def main() -> _ExitCode:  # pylint: disable=too-many-branches
                 "Video or playlist is unreachable or invalid.",
             )
 
-        except Exception as err:  # pylint: disable=broad-exception-caught
+        except Exception as err:  # pylint: disable=W0718
             create_error_window(err.__class__.__name__, str(err))
             exit_code = _EXIT_FAILURE
             break

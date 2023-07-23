@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 """Module containing the class to create a error window."""
 from __future__ import annotations
 
@@ -11,7 +9,7 @@ import PySimpleGUI as sg
 
 
 def create_error_window(error_name: str, message: str) -> None:
-    """Creates an error window."""
+    """Create an error window."""
     error_layout: list[list[sg.Text | sg.Button]] = [
         [sg.Text(f"{error_name}: {message}")],
         [sg.Button("Ok", key="-OK-"), sg.Button("Report", key="-REPORT-")],

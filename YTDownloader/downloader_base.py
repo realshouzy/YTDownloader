@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 """Module containing the base class for the YouTube downloader."""
 from __future__ import annotations
 
@@ -7,14 +5,14 @@ __all__: list[str] = ["YouTubeDownloader"]
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import PySimpleGUI as sg
 
 if TYPE_CHECKING:
     from pytube import Stream, YouTube
 
-    from .download_options import DownloadOptions
+    from YTDownloader.download_options import DownloadOptions
 
 
 class YouTubeDownloader(ABC):
@@ -29,18 +27,19 @@ class YouTubeDownloader(ABC):
         return self._url
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(url={self.url})"
+        return f"{self.__class__.__name__}(url={self.url!r})"
 
     @staticmethod
     def _remove_forbidden_characters(name: str) -> str:
-        """Helper method that removes '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+        r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+
         This avoids an OSError.
         """
         return "".join(char for char in name if char not in r'"\/:*?<>|')
 
     @staticmethod
     def _increment_dir_name(root: Path | str, sub: Path | str) -> Path:
-        """Increments the directory if the user downloads a playlist more than once."""
+        """Increment the directory if the user downloads a playlist more than once."""
         original_path: Path = Path(f"{root}/{sub}")
         if not original_path.exists():
             return original_path
@@ -54,7 +53,7 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def _increment_file_name(root: Path | str, file_name: str) -> str:
-        """Increments the file if the user downloads a video more than once."""
+        """Increment the file if the user downloads a video more than once."""
         file_path: Path = Path(f"{root}/{file_name}.mp4")
         if not file_path.exists():
             return file_name
@@ -70,8 +69,8 @@ class YouTubeDownloader(ABC):
     def _get_stream_from_video(
         video: YouTube,
         download_options: DownloadOptions,
-    ) -> Optional[Stream]:
-        """Returns a stream filtered according to the download options."""
+    ) -> Stream | None:
+        """Return a stream filtered according to the download options."""
         return video.streams.filter(
             resolution=download_options.resolution,
             type=download_options.type,
@@ -82,18 +81,18 @@ class YouTubeDownloader(ABC):
     # defining popups
     @staticmethod
     def _download_dir_popup() -> None:
-        """Creates an info pop telling 'Please select a download directory.'"""
+        """Create an info pop telling 'Please select a download directory.'."""
         sg.Popup("Please select a download directory", title="Info")
 
     @staticmethod
     def _resolution_unavailable_popup() -> None:
-        """Creates an info pop telling 'This resolution is unavailable.'"""
+        """Create an info pop telling 'This resolution is unavailable.'."""
         sg.Popup("This resolution is unavailable.", title="Info")
 
     @abstractmethod
-    def _download(self, download_options: DownloadOptions) -> None:
-        """Helper method that downloads the YouTube content into the given directory."""
+    def download(self, download_options: DownloadOptions) -> None:
+        """Download the YouTube content into the given directory."""
 
     @abstractmethod
     def create_window(self) -> None:
-        """Method that creates the event loop for the download window."""
+        """Create the event loop for the download window."""

@@ -1,20 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 """Module containing all a dataclass for the download option."""
 from __future__ import annotations
 
 __all__: list[str] = ["DownloadOptions", "LD", "HD", "AUDIO"]
 
-from typing import Final, NamedTuple, Optional
+from typing import Final, NamedTuple
 
 
 class DownloadOptions(NamedTuple):
     """Tuple-like class that defines and contains the download options."""
 
-    resolution: Optional[str]
+    resolution: str | None
     type: str  # noqa: A003
     progressive: bool
-    abr: Optional[str]
+    abr: str | None
 
 
 # defining download options

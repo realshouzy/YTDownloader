@@ -103,7 +103,7 @@ pip install -r requirements.txt
 3. Run the script:
 
 ```bash
-python -m YTDownloader
+python3 -m YTDownloader
 ```
 
 ## Tutorial

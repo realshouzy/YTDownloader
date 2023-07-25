@@ -1,7 +1,7 @@
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
 
-__all__: list[str] = ["PlaylistDownloader", "VideoDownloader", "get_downloader"]
+__all__: list[str] = ["YouTubeDownloader", "PlaylistDownloader", "VideoDownloader"]
 
 import re
 import webbrowser
@@ -12,9 +12,9 @@ from typing import TYPE_CHECKING, Any, Final
 import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
+from typing_extensions import override
 
 from YTDownloader.download_options import AUDIO, HD, LD
-from YTDownloader.downloader_base import YouTubeDownloader
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -23,29 +23,73 @@ if TYPE_CHECKING:
 
     from YTDownloader.download_options import DownloadOptions
 
+# pylint: disable=C0301
 
 _YOUTUBE_PLAYLIST_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",  # pylint: disable=C0301
+    r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
 )
 _YOUTUBE_VIDEO_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?",  # pylint: disable=C0301
+    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?",
 )
+# pylint: enable=C0301
 
 
-def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
-    """Return the appropriate YouTube downloader based on the given url.
+class YouTubeDownloader:
+    """Abstract class that defines the most important needed (abstract) methods."""
 
-    :param str url: YouTube url
-    :return PlaylistDownloader|VideoDownloader: PlaylistDownloader or VideoDownloader
-    """
-    if re.fullmatch(_YOUTUBE_PLAYLIST_PATTERN, url):
-        return PlaylistDownloader(url)
-    if re.fullmatch(_YOUTUBE_VIDEO_PATTERN, url):
-        return VideoDownloader(url)
-    raise pytube.exceptions.RegexMatchError(
-        get_downloader.__name__,
-        "_YOUTUBE_PLAYLIST_PATTERN | _YOUTUBE_VIDEO_PATTERN",
-    )
+    def __new__(cls, url: str) -> YouTubeDownloader:  # noqa: D102
+        if _YOUTUBE_PLAYLIST_PATTERN.fullmatch(url):
+            return object.__new__(PlaylistDownloader)
+
+        if _YOUTUBE_VIDEO_PATTERN.fullmatch(url):
+            return object.__new__(VideoDownloader)
+
+        raise pytube.exceptions.RegexMatchError(
+            cls.__name__,
+            "_YOUTUBE_PLAYLIST_PATTERN | _YOUTUBE_VIDEO_PATTERN",
+        )
+
+    def __init__(self, url: str) -> None:
+        self._url: str = url if url.startswith("https://") else f"https://{url}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(url={self.url!r})"
+
+    @property
+    def url(self) -> str:
+        """The YouTube URL."""
+        return self._url
+
+    @staticmethod
+    def _get_stream_from_video(
+        video: YouTube,
+        download_options: DownloadOptions,
+    ) -> Stream | None:
+        """Return a stream filtered according to the download options."""
+        return video.streams.filter(
+            resolution=download_options.resolution,
+            type=download_options.type,
+            progressive=download_options.progressive,
+            abr=download_options.abr,
+        ).first()
+
+    @staticmethod
+    def _download_dir_popup() -> None:
+        """Create an info pop telling 'Please select a download directory.'."""
+        sg.Popup("Please select a download directory", title="Info")
+
+    @staticmethod
+    def _resolution_unavailable_popup() -> None:
+        """Create an info pop telling 'This resolution is unavailable.'."""
+        sg.Popup("This resolution is unavailable.", title="Info")
+
+    def download(self, download_options: DownloadOptions, download_dir: Path) -> None:
+        """Download the YouTube content into the given directory."""
+        raise NotImplementedError
+
+    def create_window(self) -> None:
+        """Create the event loop for the download window."""
+        raise NotImplementedError
 
 
 def _remove_forbidden_characters(name: str) -> str:
@@ -89,14 +133,6 @@ def _increment_video_file_name(root: Path | str, file_name: str) -> str:
 
 class PlaylistDownloader(YouTubeDownloader):
     """Class handling the download of a YouTube playlist."""
-
-    __slots__: tuple[str, ...] = (
-        "_url",
-        "_playlist",
-        "_stream_selection",
-        "_download_window",
-        "_download_folder",
-    )
 
     def __init__(self, url: str) -> None:
         super().__init__(url)
@@ -241,14 +277,11 @@ class PlaylistDownloader(YouTubeDownloader):
             )
         return f"{round(sum(stream_sizes) / 1048576, 1)} MB"
 
-    def create_window(self) -> None:  # noqa: D102
+    @override
+    def create_window(self) -> None:
         # download window event loops
         while True:
             event, values = self._download_window.read()  # type: ignore
-            try:
-                self._download_folder: str = values["-FOLDER-"]
-            except TypeError:
-                break
 
             if event == sg.WIN_CLOSED:
                 break
@@ -260,18 +293,23 @@ class PlaylistDownloader(YouTubeDownloader):
                 webbrowser.open(self.playlist.owner_url)
 
             if event == "-HD-":
-                self.download(HD)
+                self.download(HD, values["-FOLDER-"])
 
             if event == "-LD-":
-                self.download(LD)
+                self.download(LD, values["-FOLDER-"])
 
             if event == "-AUDIOALL-":
-                self.download(AUDIO)
+                self.download(AUDIO, values["-FOLDER-"])
 
         self._download_window.close()
 
-    def download(self, download_options: DownloadOptions) -> None:  # noqa: D102
-        if not self._download_folder:
+    @override
+    def download(
+        self,
+        download_options: DownloadOptions,
+        download_dir: Path,
+    ) -> None:
+        if not download_dir:
             self._download_dir_popup()
             return
 
@@ -280,7 +318,7 @@ class PlaylistDownloader(YouTubeDownloader):
             return
 
         download_path: Path = _increment_playlist_dir_name(
-            self._download_folder,
+            download_dir,
             _remove_forbidden_characters(self.playlist.title),
         )
 
@@ -304,14 +342,6 @@ class PlaylistDownloader(YouTubeDownloader):
 
 class VideoDownloader(YouTubeDownloader):
     """Class handling the download of a YouTube video."""
-
-    __slots__: tuple[str, ...] = (
-        "_url",
-        "_video",
-        "_stream_selection",
-        "_download_window",
-        "_download_folder",
-    )
 
     def __init__(self, url: str) -> None:
         super().__init__(url)
@@ -444,14 +474,11 @@ class VideoDownloader(YouTubeDownloader):
             return "Unavailable"
         return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 
-    def create_window(self) -> None:  # noqa: D102
+    @override
+    def create_window(self) -> None:
         # download window event loop
         while True:
             event, values = self._download_window.read()  # type: ignore
-            try:
-                self._download_folder = values["-FOLDER-"]
-            except TypeError:
-                break
 
             if event == sg.WIN_CLOSED:
                 break
@@ -466,18 +493,23 @@ class VideoDownloader(YouTubeDownloader):
                 webbrowser.open(self.video.thumbnail_url)
 
             if event == "-HD-":
-                self.download(HD)
+                self.download(HD, values["-FOLDER-"])
 
             if event == "-LD-":
-                self.download(LD)
+                self.download(LD, values["-FOLDER-"])
 
             if event == "-AUDIO-":
-                self.download(AUDIO)
+                self.download(AUDIO, values["-FOLDER-"])
 
         self._download_window.close()
 
-    def download(self, download_options: DownloadOptions) -> None:  # noqa: D102
-        if not self._download_folder:
+    @override
+    def download(
+        self,
+        download_options: DownloadOptions,
+        download_dir: Path,
+    ) -> None:
+        if not download_dir:
             self._download_dir_popup()
             return
 
@@ -486,9 +518,11 @@ class VideoDownloader(YouTubeDownloader):
             return
 
         clean_video_title: str = _remove_forbidden_characters(self.video.title)
-        file_path: str = f"{_increment_video_file_name(self._download_folder, clean_video_title)}.mp4"  # pylint: disable=C0301
+        file_path: str = (
+            f"{_increment_video_file_name(download_dir, clean_video_title)}.mp4"
+        )
 
-        stream_selection.download(output_path=self._download_folder, filename=file_path)
+        stream_selection.download(output_path=str(download_dir), filename=file_path)
 
     def _progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
         """Update the progress bar when progress in the download was made."""

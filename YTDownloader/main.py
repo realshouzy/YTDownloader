@@ -4,21 +4,18 @@ from __future__ import annotations
 
 __all__: list[str] = ["main"]
 
-from typing import TYPE_CHECKING
-
 import PySimpleGUI as sg
 import pytube.exceptions
 
-from YTDownloader.downloader import get_downloader
+from YTDownloader.downloader import YouTubeDownloader
 from YTDownloader.error_window import create_error_window
-
-if TYPE_CHECKING:
-    from YTDownloader.downloader import PlaylistDownloader, VideoDownloader
 
 sg.theme("Darkred1")
 
+# pylint: disable=R0912, W0718
 
-def main() -> int:  # pylint: disable=R0912 # noqa: C901
+
+def main() -> int:  # noqa: C901
     """Run the program."""
     exit_code: int = 0
 
@@ -36,8 +33,8 @@ def main() -> int:  # pylint: disable=R0912 # noqa: C901
                 break
 
             if event == "Submit":
-                youtube_downloader: PlaylistDownloader | VideoDownloader = (
-                    get_downloader(values["-LINKINPUT-"])
+                youtube_downloader: YouTubeDownloader = YouTubeDownloader(
+                    values["-LINKINPUT-"],
                 )
                 youtube_downloader.create_window()
 
@@ -83,7 +80,7 @@ def main() -> int:  # pylint: disable=R0912 # noqa: C901
                 "Video or playlist is unreachable or invalid.",
             )
 
-        except Exception as err:  # pylint: disable=W0718
+        except Exception as err:
             create_error_window(err.__class__.__name__, str(err))
             exit_code = 1
             break

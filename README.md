@@ -24,29 +24,17 @@
 
 <br />
 
-## Info
-
-This project is mostly finished and technically archived, meaning I probably won't add any new features. Although, if necessary, I will fix bugs and other issues.
-Additionally, if someone wants to contribute to this project, any [pull request](https://github.com/realshouzy/YTDownloader/pulls) is welcome.
-
 ## Disclaimer
+
+**WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!**
+
+## Credit
 
 This concept is **not** my idea. I was inspired by **[Clear Code]** from this **[Video]**.
 I took the liberty to add some features, such as downloading playlists, selecting a download directory and other adjustments and improvements.
 You can find the orignial code [here](https://pastebin.com/gRtcAv5c).
 
 The [icon](assets/YTDownloader.ico) can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUWH1MDX6wkgY4psWSZt5BzY4/rs:fit:512:512:1/g:ce/aHR0cHM6Ly9jZG4u/aWNvbi1pY29ucy5j/b20vaWNvbnMyLzEz/ODEvUE5HLzUxMi95/b3V0dWJlZGxfOTM1/MjkucG5n).
-
-**WARNING: DOWNLOADING COPYRIGHTED MATERIAL IS HIGHLY ILLEGAL! I DO NOT TAKE ANY RESPONSIBILITY FOR YOUR USAGE OF THIS TOOL!**
-
-Note that ``pytube`` occasionally shows some issues with downloading playlists.
-
-## Download
-
-- For Windows just download the executable [here](https://github.com/realshouzy/YTDownloader/releases)
-- For Linux or macOS download the source code, install the [requirements](requirements.txt) via pip and run [main.py](scripts/main.py) in the scripts module
-
-(If you want the latest version, download the source code directly as releases can be delayed.)
 
 ## Running the Program
 
@@ -58,7 +46,6 @@ The used libraries are:
 
 ```python
 # standard library
-import abc
 import concurrent.futures
 import pathlib
 import re
@@ -68,18 +55,55 @@ import webbrowser
 # third party
 import PySimpleGUI
 import pytube
+import typing_extensions
 ```
 
 ### On Windows
 
-Just run the executable.
+Simply download the executable [here](https://github.com/realshouzy/YTDownloader/releases) and run it. This is the quickest way to get started.
+
+Alternatively, you can directly run the script by following these steps:
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/realshouzy/YTDownloader.git && cd YTDownloader
+```
+
+2. Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the script:
+
+```bash
+python -m YTDownloader
+```
+
+Running the script this way ensures you have access to the latest features and updates.
 
 ### On Linux or macOS
 
+Unfortunately, there is no pre-built executable for Unix systems, so you'll need to do the whole procedure:
+
+1. Clone the repository:
+
 ```bash
-git clone https://github.com/realshouzy/YTDownloader.git
+git clone https://github.com/realshouzy/YTDownloader.git && cd YTDownloader
+```
+
+2. Install the required dependencies:
+
+```bash
 pip install -r requirements.txt
-python3 /script/main.py
+```
+
+3. Run the script:
+
+```bash
+python -m YTDownloader
 ```
 
 ## Tutorial

@@ -16,8 +16,7 @@
 [![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yml/badge.svg)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/realshouzy/YTDownloader/main.svg)](https://results.pre-commit.ci/latest/github/realshouzy/YTDownloader/main)
 [![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
-[![Release Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)
-[![Code Size](https://img.shields.io/github/languages/code-size/realshouzy/YTDownloader)](https://github.com/realshouzy/YTDownloader)
+[![Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20|%203.11-blue.svg)](https://www.python.org/downloads)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/realshouzy/YTDownloader/blob/main/LICENSE)
 

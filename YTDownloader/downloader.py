@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from YTDownloader.download_options import DownloadOptions
 
 # pylint: disable=C0301
-
 _YOUTUBE_PLAYLIST_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
 )
@@ -34,8 +33,51 @@ _YOUTUBE_VIDEO_PATTERN: Final[re.Pattern[str]] = re.compile(
 # pylint: enable=C0301
 
 
+# defining helper functions
+def _increment_playlist_dir_name(root: Path | str, sub: Path | str) -> Path:
+    """Increment the directory if the user downloads a playlist more than once."""
+    original_path: Path = Path(f"{root}/{sub}")
+    if not original_path.exists():
+        return original_path
+
+    i: int = 1
+    while Path(f"{root}/{sub} ({i})").exists():
+        i += 1
+
+    new_path: Path = Path(f"{root}/{sub} ({i})")
+    return new_path
+
+
+def _increment_video_file_name(root: Path | str, file_name: str) -> str:
+    """Increment the file if the user downloads a video more than once."""
+    file_path: Path = Path(f"{root}/{file_name}.mp4")
+    if not file_path.exists():
+        return file_name
+
+    i: int = 1
+    while Path(f"{root}/{file_name} ({i}).mp4").exists():
+        i += 1
+
+    new_file_name: str = f"{file_name} ({i})"
+    return new_file_name
+
+
+class MethodNotImplementedError(NotImplementedError):
+    """Method hasn't been implemented."""
+
+    def __init__(self, method_name: str) -> None:
+        super().__init__(
+            f"The '{method_name}' method must be implemented in a subclass.",
+        )
+
+
 class YouTubeDownloader:
-    """Abstract class that defines the most important needed (abstract) methods."""
+    """YouTubeDownloader is a base class for downloading YouTube content.
+
+    It implements the Factory design pattern to create instances of different downloaders
+    based on the type of YouTube URL provided. Thus this class can not be directly instantiated.
+    Instead, it should be used as a base class for creating specific YouTube downloaders.
+    """
 
     def __new__(cls, url: str) -> YouTubeDownloader:  # noqa: D102
         if _YOUTUBE_PLAYLIST_PATTERN.fullmatch(url):
@@ -85,11 +127,11 @@ class YouTubeDownloader:
 
     def download(self, download_options: DownloadOptions, download_dir: Path) -> None:
         """Download the YouTube content into the given directory."""
-        raise NotImplementedError
+        raise MethodNotImplementedError(self.download.__name__)
 
     def create_window(self) -> None:
         """Create the event loop for the download window."""
-        raise NotImplementedError
+        raise MethodNotImplementedError(self.create_window.__name__)
 
 
 def _remove_forbidden_characters(name: str) -> str:
@@ -100,39 +142,12 @@ def _remove_forbidden_characters(name: str) -> str:
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
-def _increment_playlist_dir_name(root: Path | str, sub: Path | str) -> Path:
-    """Increment the directory if the user downloads a playlist more than once."""
-    original_path: Path = Path(f"{root}/{sub}")
-    if not original_path.exists():
-        return original_path
-
-    i: int = 1
-    while Path(f"{root}/{sub} ({i})").exists():
-        i += 1
-
-    new_path: Path = Path(f"{root}/{sub} ({i})")
-    return new_path
-
-
-def _increment_video_file_name(root: Path | str, file_name: str) -> str:
-    """Increment the file if the user downloads a video more than once."""
-    file_path: Path = Path(f"{root}/{file_name}.mp4")
-    if not file_path.exists():
-        return file_name
-
-    i: int = 1
-    while Path(f"{root}/{file_name} ({i}).mp4").exists():
-        i += 1
-
-    new_file_name: str = f"{file_name} ({i})"
-    return new_file_name
-
-
-# pylint: disable=attribute-defined-outside-init, unused-argument
-
-
 class PlaylistDownloader(YouTubeDownloader):
-    """Class handling the download of a YouTube playlist."""
+    """Class handling the download of a YouTube playlist.
+
+    It inherits from ``YouTubeDownloader``
+    and implements playlist-specific download functionalities.
+    """
 
     def __init__(self, url: str) -> None:
         super().__init__(url)
@@ -142,7 +157,7 @@ class PlaylistDownloader(YouTubeDownloader):
         hd_list: list[Stream | None] = self._get_playlist(HD)
         ld_list: list[Stream | None] = self._get_playlist(LD)
         audio_list: list[Stream | None] = self._get_playlist(AUDIO)
-        self._stream_selection: dict[DownloadOptions, list[Stream] | None] = {  # type: ignore
+        self._stream_selection: dict[DownloadOptions, list[Stream] | None] = {
             HD: hd_list if None not in hd_list else None,
             LD: ld_list if None not in ld_list else None,
             AUDIO: audio_list if None not in audio_list else None,
@@ -152,7 +167,7 @@ class PlaylistDownloader(YouTubeDownloader):
         info_tab: list[list[sg.Text]] = [
             [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
             [sg.Text("Title:"), sg.Text(self.playlist.title)],
-            [sg.Text("Videos:"), sg.Text(self.playlist.length)],  # type: ignore
+            [sg.Text("Videos:"), sg.Text(self.playlist.length)],
             [sg.Text("Views:"), sg.Text(f"{self.playlist.views:,}")],
             [
                 sg.Text("Owner:"),
@@ -173,7 +188,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-HD-"),
-                            sg.Text(HD.resolution),  # type: ignore
+                            sg.Text(HD.resolution),
                             sg.Text(self._get_playlist_size(HD)),
                         ],
                     ],
@@ -185,7 +200,7 @@ class PlaylistDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download All", key="-LD-"),
-                            sg.Text(LD.resolution),  # type: ignore
+                            sg.Text(LD.resolution),
                             sg.Text(self._get_playlist_size(LD)),
                         ],
                     ],
@@ -281,7 +296,7 @@ class PlaylistDownloader(YouTubeDownloader):
     def create_window(self) -> None:
         # download window event loops
         while True:
-            event, values = self._download_window.read()  # type: ignore
+            event, values = self._download_window.read()
 
             if event == sg.WIN_CLOSED:
                 break
@@ -325,23 +340,27 @@ class PlaylistDownloader(YouTubeDownloader):
         download_counter: int = 0
         for video in streams_selection:
             clean_filename: str = f"{_remove_forbidden_characters(video.title)}.mp4"
-            video.download(output_path=str(download_path), filename=clean_filename)  # type: ignore
+            video.download(output_path=str(download_path), filename=clean_filename)
             download_counter += 1
-            self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)  # type: ignore
+            self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)
             self._download_window["-COMPLETED-"].update(
-                f"{download_counter} of {self.playlist.length}",  # type: ignore
+                f"{download_counter} of {self.playlist.length}",
             )
         self._download_complete()
 
     def _download_complete(self) -> None:
         """Reset the download progressbar and notifies the user when the download has finished."""
-        self._download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
-        self._download_window["-COMPLETED-"].update("")  # type: ignore
+        self._download_window["-DOWNLOADPROGRESS-"].update(0)
+        self._download_window["-COMPLETED-"].update("")
         sg.Popup("Download completed")
 
 
 class VideoDownloader(YouTubeDownloader):
-    """Class handling the download of a YouTube video."""
+    """Class handling the download of a YouTube video.
+
+    It It inherits from ``YouTubeDownloader``
+    and implements video-specific download functionalities.
+    """
 
     def __init__(self, url: str) -> None:
         super().__init__(url)
@@ -398,7 +417,7 @@ class VideoDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download", key="-HD-"),
-                            sg.Text(HD.resolution),  # type: ignore
+                            sg.Text(HD.resolution),
                             sg.Text(self._get_video_size(HD)),
                         ],
                     ],
@@ -410,7 +429,7 @@ class VideoDownloader(YouTubeDownloader):
                     [
                         [
                             sg.Button("Download", key="-LD-"),
-                            sg.Text(LD.resolution),  # type: ignore
+                            sg.Text(LD.resolution),
                             sg.Text(self._get_video_size(LD)),
                         ],
                     ],
@@ -478,7 +497,7 @@ class VideoDownloader(YouTubeDownloader):
     def create_window(self) -> None:
         # download window event loop
         while True:
-            event, values = self._download_window.read()  # type: ignore
+            event, values = self._download_window.read()
 
             if event == sg.WIN_CLOSED:
                 break
@@ -524,17 +543,19 @@ class VideoDownloader(YouTubeDownloader):
 
         stream_selection.download(output_path=str(download_dir), filename=file_path)
 
+    # pylint: disable=W0613
+
     def _progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
         """Update the progress bar when progress in the download was made."""
         self._download_window["-DOWNLOADPROGRESS-"].update(
-            100 - round(bytes_remaining / stream.filesize * 100),  # type: ignore
+            100 - round(bytes_remaining / stream.filesize * 100),
         )
         self._download_window["-COMPLETED-"].update(
-            f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",  # type: ignore
+            f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",
         )
 
     def _on_complete(self, stream: Any, file_path: str | None) -> None:
         """Reset the progress bar when the video download has finished."""
-        self._download_window["-DOWNLOADPROGRESS-"].update(0)  # type: ignore
-        self._download_window["-COMPLETED-"].update("")  # type: ignore
+        self._download_window["-DOWNLOADPROGRESS-"].update(0)
+        self._download_window["-COMPLETED-"].update("")
         sg.Popup("Downloaded complete")

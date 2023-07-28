@@ -7,7 +7,7 @@ from typing import Final, NamedTuple
 
 
 class DownloadOptions(NamedTuple):
-    """Tuple-like class that defines and contains the download options."""
+    """Tuple-like class holding the download options."""
 
     resolution: str | None
     type: str  # noqa: A003

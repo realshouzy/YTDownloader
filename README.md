@@ -13,7 +13,7 @@
 
 <div align = 'center'>
 
-[![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yml/badge.svg)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yml)
+[![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml/badge.svg)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/realshouzy/YTDownloader/main.svg)](https://results.pre-commit.ci/latest/github/realshouzy/YTDownloader/main)
 [![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
 [![Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)

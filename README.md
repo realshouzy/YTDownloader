@@ -13,12 +13,15 @@
 
 <div align = 'center'>
 
-[![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml/badge.svg)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/realshouzy/YTDownloader/main.svg)](https://results.pre-commit.ci/latest/github/realshouzy/YTDownloader/main)
+[![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml/badge.svg?branch=main)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml)
 [![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
+[![semantic-release](https://img.shields.io/badge/%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/realshouzy/YTDownloader/releases)
 [![Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20|%203.11-blue.svg)](https://www.python.org/downloads)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/realshouzy/YTDownloader/blob/main/LICENSE)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 </div>
 

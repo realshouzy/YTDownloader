@@ -228,7 +228,7 @@ class PlaylistDownloader(YouTubeDownloader):
                 ),
             ],
             [
-                sg.Progress(
+                sg.ProgressBar(
                     self.playlist.length,
                     orientation="h",
                     size=(20, 20),
@@ -367,7 +367,7 @@ class VideoDownloader(YouTubeDownloader):
         self._video: YouTube = YouTube(
             self.url,
             on_progress_callback=self._progress_check,
-            on_complete_callback=self._on_complete,
+            on_complete_callback=self._download_complete,
         )
 
         # binding videos to corresponding download option
@@ -404,7 +404,7 @@ class VideoDownloader(YouTubeDownloader):
 
         download_tab: list[
             list[sg.Text | sg.Input | sg.Button]
-            | list[sg.Text | sg.Input | sg.Frame | sg.Progress]
+            | list[sg.Text | sg.Input | sg.Frame | sg.ProgressBar]
         ] = [
             [
                 sg.Text("Download Folder"),
@@ -457,7 +457,7 @@ class VideoDownloader(YouTubeDownloader):
                 ),
             ],
             [
-                sg.Progress(
+                sg.ProgressBar(
                     100,
                     orientation="h",
                     size=(20, 20),
@@ -550,11 +550,9 @@ class VideoDownloader(YouTubeDownloader):
         self._download_window["-DOWNLOADPROGRESS-"].update(
             100 - round(bytes_remaining / stream.filesize * 100),
         )
-        self._download_window["-COMPLETED-"].update(
-            f"{100 - round(bytes_remaining / stream.filesize * 100)}% completed",
-        )
+        self._download_window["-COMPLETED-"].update(r"100% completed")
 
-    def _on_complete(self, stream: Any, file_path: str | None) -> None:
+    def _download_complete(self, stream: Any, file_path: str | None) -> None:
         """Reset the progress bar when the video download has finished."""
         self._download_window["-DOWNLOADPROGRESS-"].update(0)
         self._download_window["-COMPLETED-"].update("")

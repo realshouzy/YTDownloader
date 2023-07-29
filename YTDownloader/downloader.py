@@ -62,6 +62,14 @@ def _increment_video_file_name(root: Path | str, file_name: str) -> str:
     return new_file_name
 
 
+def _remove_forbidden_characters(name: str) -> str:
+    r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+
+    This avoids an OSError.
+    """
+    return "".join(char for char in name if char not in r'"\/:*?<>|')
+
+
 class MethodNotImplementedError(NotImplementedError):
     """Method hasn't been implemented."""
 
@@ -132,14 +140,6 @@ class YouTubeDownloader:
     def create_window(self) -> None:
         """Create the event loop for the download window."""
         raise MethodNotImplementedError(self.create_window.__name__)
-
-
-def _remove_forbidden_characters(name: str) -> str:
-    r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
-
-    This avoids an OSError.
-    """
-    return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
 class PlaylistDownloader(YouTubeDownloader):

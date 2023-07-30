@@ -43,7 +43,7 @@ The [icon](assets/YTDownloader.ico) can be found [here](https://imgs.search.brav
 
 ### Requirements
 
-Make sure you have Python 3.10 or higher installed.
+Make sure you have Python 3.8 or higher installed.
 
 The used libraries are:
 

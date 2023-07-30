@@ -7,20 +7,22 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: Implementation :: CPython"
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 dynamic = ["version", "readme", "dependencies"]
 
 [tool.setuptools.dynamic]
-version = {attr = "auto_file_sorter.__version__"}
-readme = {file = ["README.md"]}
-dependencies = {file = "requirements.txt"}
+version = { attr = "auto_file_sorter.__version__" }
+readme = { file = ["README.md"] }
+dependencies = { file = "requirements.txt" }
 
 [tool.black]
-target-version = ["py311", "py310"]
+target-version = ["py311", "py310", "py39", "py38"]
 line-length = 88
 
 [tool.isort]

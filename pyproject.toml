@@ -69,6 +69,9 @@ show-fixes = true
 target-version = "py311"
 line-length = 88
 
+[tool.ruff.extend-per-file-ignores]
+"./tests/test_*.py" = ["ANN201", "D103", "S101"]
+
 [tool.ruff.isort]
 known-first-party = ["YTDownloader"]
 required-imports = ["from __future__ import annotations"]
@@ -78,3 +81,6 @@ convention = "pep257"
 
 [tool.pylint]
 disable = ["C0103"]
+
+[tool.bandit]
+exclude_dirs = ["tests"]

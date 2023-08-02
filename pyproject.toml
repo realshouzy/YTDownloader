@@ -70,7 +70,7 @@ target-version = "py311"
 line-length = 88
 
 [tool.ruff.extend-per-file-ignores]
-"./tests/test_*.py" = ["ANN201", "D103", "S101"]
+"./tests/*_test.py" = ["ANN201", "D103", "S101"]
 
 [tool.ruff.isort]
 known-first-party = ["YTDownloader"]

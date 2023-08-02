@@ -13,7 +13,6 @@ repos:
       - id: check-ast
       - id: debug-statements
       - id: name-tests-test
-        args: ["--pytest-test-first"]
       - id: check-yaml
       - id: fix-encoding-pragma
         args: [--remove]

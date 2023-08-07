@@ -110,6 +110,13 @@ class YouTubeDownloader:
         """The YouTube URL."""
         return self._url
 
+    @property
+    def window(self) -> sg.Window:
+        """The GUI window."""
+        raise NotImplementedError(
+            "'window' property must be implemented in a subclass.",
+        )
+
     @staticmethod
     def _get_stream_from_video(
         video: YouTube,
@@ -135,11 +142,15 @@ class YouTubeDownloader:
 
     def download(self, download_options: DownloadOptions, download_dir: Path) -> None:
         """Download the YouTube content into the given directory."""
-        raise MethodNotImplementedError(self.download.__name__)
+        raise NotImplementedError(
+            f"'{self.download.__name__}' method must be implemented in a subclass.",
+        )
 
     def create_window(self) -> None:
         """Create the event loop for the download window."""
-        raise MethodNotImplementedError(self.create_window.__name__)
+        raise NotImplementedError(
+            f"'{self.create_window.__name__}' method must be implemented in a subclass.",
+        )
 
 
 class PlaylistDownloader(YouTubeDownloader):
@@ -257,6 +268,11 @@ class PlaylistDownloader(YouTubeDownloader):
             main_layout,
             modal=True,
         )
+
+    @override
+    @property
+    def window(self) -> sg.Window:
+        return self._download_window
 
     def _get_playlist(
         self,
@@ -479,6 +495,11 @@ class VideoDownloader(YouTubeDownloader):
             main_layout,
             modal=True,
         )
+
+    @override
+    @property
+    def window(self) -> sg.Window:
+        return self._download_window
 
     def _get_video_size(self, download_options: DownloadOptions) -> str:
         """Return the size of the video to the corresponding download option."""

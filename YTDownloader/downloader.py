@@ -70,15 +70,6 @@ def _remove_forbidden_characters(name: str) -> str:
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
-class MethodNotImplementedError(NotImplementedError):
-    """Method hasn't been implemented."""
-
-    def __init__(self, method_name: str) -> None:
-        super().__init__(
-            f"The '{method_name}' method must be implemented in a subclass.",
-        )
-
-
 class YouTubeDownloader:
     """YouTubeDownloader is a base class for downloading YouTube content.
 

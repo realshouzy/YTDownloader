@@ -23,14 +23,16 @@ if TYPE_CHECKING:
 
     from YTDownloader.download_options import DownloadOptions
 
-# pylint: disable=C0301
-_YOUTUBE_PLAYLIST_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))\/playlist\?list=([0-9A-Za-z_-]{34})",
+_YOUTUBE_PLAYLIST_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"^(?:https?:\/\/)?(?:www\.|m\.)?"
+    r"(?:youtube(?:-nocookie)?\.com|youtu.be)"
+    r"\/playlist\?list=[\w-]+$",
 )
-_YOUTUBE_VIDEO_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)(?:\&(?:.*))?(?:\?(?:.*&)?t=([\dhms]+))?",
+_YOUTUBE_VIDEO_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?"
+    r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-_]+"
+    r"(?:\&(?:.*))?(?:\?(?:.*&)?t=[\dhms]+)?$",
 )
-# pylint: enable=C0301
 
 
 # defining helper functions
@@ -79,10 +81,10 @@ class YouTubeDownloader:
     """
 
     def __new__(cls, url: str) -> YouTubeDownloader:  # noqa: D102
-        if _YOUTUBE_PLAYLIST_PATTERN.fullmatch(url):
+        if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url):
             return object.__new__(PlaylistDownloader)
 
-        if _YOUTUBE_VIDEO_PATTERN.fullmatch(url):
+        if _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(url):
             return object.__new__(VideoDownloader)
 
         raise pytube.exceptions.RegexMatchError(

@@ -1,4 +1,4 @@
-"""Tests for ``YTDownloader.download_options.py``."""
+"""Tests for ``YTDownloader.download_options``."""
 from __future__ import annotations
 
 from YTDownloader.download_options import AUDIO, HD, LD

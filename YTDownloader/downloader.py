@@ -32,12 +32,12 @@ if TYPE_CHECKING:
 _YOUTUBE_PLAYLIST_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^(?:https?:\/\/)?(?:www\.|m\.)?"
     r"(?:youtube(?:-nocookie)?\.com|youtu.be)"
-    r"\/playlist\?list=[\w-]+$",
+    r"\/playlist\?list=[\w-]{34}$",
 )
 _YOUTUBE_VIDEO_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?"
     r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-_]+"
-    r"(?:\&(?:.*))?(?:\?(?:.*&)?t=[\dhms]+)?$",
+    r"(?:\&(?:.*))?(?:\?(?:.*&)?t=[\dhms]{11})?$",
 )
 
 
@@ -70,10 +70,10 @@ def _increment_video_file_name(root: Path | str, file_name: str) -> str:
     return new_file_name
 
 
-def _remove_forbidden_characters(name: str) -> str:
-    r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a string.
+def _remove_forbidden_characters_from_file_name(name: str) -> str:
+    r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a a file name.
 
-    This avoids an OSError.
+    This avoids an OSError while saving or moving a file.
     """
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
@@ -333,12 +333,14 @@ class PlaylistDownloader(YouTubeDownloader):
 
         download_path: Path = _increment_playlist_dir_name(
             download_dir,
-            _remove_forbidden_characters(self._playlist.title),
+            _remove_forbidden_characters_from_file_name(self._playlist.title),
         )
 
         download_counter: int = 0
         for video in streams_selection:
-            clean_filename: str = f"{_remove_forbidden_characters(video.title)}.mp4"
+            clean_filename: str = (
+                f"{_remove_forbidden_characters_from_file_name(video.title)}.mp4"
+            )
             video.download(output_path=str(download_path), filename=clean_filename)
             download_counter += 1
             self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)
@@ -538,7 +540,9 @@ class VideoDownloader(YouTubeDownloader):
             self._resolution_unavailable_popup()
             return
 
-        clean_video_title: str = _remove_forbidden_characters(self._video.title)
+        clean_video_title: str = _remove_forbidden_characters_from_file_name(
+            self._video.title,
+        )
         file_path: str = (
             f"{_increment_video_file_name(download_dir, clean_video_title)}.mp4"
         )

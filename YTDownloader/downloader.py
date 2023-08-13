@@ -1,10 +1,16 @@
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
 
-__all__: list[str] = ["YouTubeDownloader", "PlaylistDownloader", "VideoDownloader"]
+__all__: list[str] = [
+    "YouTubeDownloader",
+    "PlaylistDownloader",
+    "VideoDownloader",
+    "get_downloader",
+]
 
 import re
 import webbrowser
+from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final
@@ -72,25 +78,20 @@ def _remove_forbidden_characters(name: str) -> str:
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
-class YouTubeDownloader:
-    """YouTubeDownloader is a base class for downloading YouTube content.
+def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
+    """Return the appropriate YouTube downloader based on the given url."""
+    if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url):
+        return PlaylistDownloader(url)
+    if _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(url):
+        return VideoDownloader(url)
+    raise pytube.exceptions.RegexMatchError(
+        get_downloader.__name__,
+        "_YOUTUBE_PLAYLIST_URL_PATTERN | _YOUTUBE_VIDEO_URL_PATTERN",
+    )
 
-    It implements the Factory design pattern to create instances of different downloaders
-    based on the type of YouTube URL provided. Thus this class can not be directly instantiated.
-    Instead, it should be used as a base class for creating specific YouTube downloaders.
-    """
 
-    def __new__(cls, url: str) -> YouTubeDownloader:  # noqa: D102
-        if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url):
-            return object.__new__(PlaylistDownloader)
-
-        if _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(url):
-            return object.__new__(VideoDownloader)
-
-        raise pytube.exceptions.RegexMatchError(
-            cls.__name__,
-            "_YOUTUBE_PLAYLIST_PATTERN | _YOUTUBE_VIDEO_PATTERN",
-        )
+class YouTubeDownloader(ABC):
+    """YouTubeDownloader is the abstract base class for downloading YouTube content."""
 
     def __init__(self, url: str) -> None:
         self._url: str = url if url.startswith("https://") else f"https://{url}"
@@ -104,11 +105,9 @@ class YouTubeDownloader:
         return self._url
 
     @property
+    @abstractmethod
     def window(self) -> sg.Window:
         """The GUI window."""
-        raise NotImplementedError(
-            "'window' property must be implemented in a subclass.",
-        )
 
     @staticmethod
     def _get_stream_from_video(
@@ -133,17 +132,13 @@ class YouTubeDownloader:
         """Create an info pop telling 'This resolution is unavailable.'."""
         sg.Popup("This resolution is unavailable.", title="Info")
 
+    @abstractmethod
     def download(self, download_options: DownloadOptions, download_dir: Path) -> None:
         """Download the YouTube content into the given directory."""
-        raise NotImplementedError(
-            f"'{self.download.__name__}' method must be implemented in a subclass.",
-        )
 
+    @abstractmethod
     def create_window(self) -> None:
         """Create the event loop for the download window."""
-        raise NotImplementedError(
-            f"'{self.create_window.__name__}' method must be implemented in a subclass.",
-        )
 
 
 class PlaylistDownloader(YouTubeDownloader):

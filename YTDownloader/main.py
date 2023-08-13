@@ -4,11 +4,16 @@ from __future__ import annotations
 
 __all__: list[str] = ["main"]
 
+from typing import TYPE_CHECKING
+
 import PySimpleGUI as sg
 import pytube.exceptions
 
-from YTDownloader.downloader import YouTubeDownloader
+from YTDownloader.downloader import get_downloader
 from YTDownloader.error_window import create_error_window
+
+if TYPE_CHECKING:
+    from YTDownloader.downloader import PlaylistDownloader, VideoDownloader
 
 sg.theme("Darkred1")
 
@@ -33,10 +38,10 @@ def main() -> int:  # noqa: C901
 
         if event == "Submit":
             try:
-                youtube_downloader: YouTubeDownloader = YouTubeDownloader(
+                downloader: PlaylistDownloader | VideoDownloader = get_downloader(
                     values["-LINKINPUT-"],
                 )
-                youtube_downloader.create_window()
+                downloader.create_window()
 
             except pytube.exceptions.RegexMatchError as re_err:
                 if not values["-LINKINPUT-"]:

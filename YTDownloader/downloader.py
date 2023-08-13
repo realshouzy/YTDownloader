@@ -32,12 +32,12 @@ if TYPE_CHECKING:
 _YOUTUBE_PLAYLIST_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^(?:https?:\/\/)?(?:www\.|m\.)?"
     r"(?:youtube(?:-nocookie)?\.com|youtu.be)"
-    r"\/playlist\?list=[\w-]{34}$",
+    r"\/playlist\?list=[\w\-_]{34}$",
 )
 _YOUTUBE_VIDEO_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?"
-    r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-_]+"
-    r"(?:\&(?:.*))?(?:\?(?:.*&)?t=[\dhms]{11})?$",
+    r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-_]{11}"
+    r"(?:\S+)?(?:\?t=(?:\d+h)?(?:\d+m)?(?:\d+s)?(?:\d+))?$",
 )
 
 

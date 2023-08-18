@@ -3,6 +3,7 @@ name = "YTDownloader"
 description = "A program to download any YouTube video or playlist"
 license = { text = "MIT" }
 authors = [{ name = "realshouzy" }]
+maintainers = [{name = "realshouzy"}]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",

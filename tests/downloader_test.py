@@ -6,6 +6,7 @@ from abc import ABC
 from typing import TYPE_CHECKING
 
 import pytest
+import pytube.exceptions
 
 from YTDownloader.downloader import (
     _YOUTUBE_PLAYLIST_URL_PATTERN,
@@ -16,6 +17,7 @@ from YTDownloader.downloader import (
     _increment_playlist_dir_name,
     _increment_video_file_name,
     _remove_forbidden_characters_from_file_name,
+    get_downloader,
 )
 
 if TYPE_CHECKING:
@@ -41,11 +43,7 @@ VALID_VIDEO_URLS: list[str] = [
     "youtube.com/watch?v=dQw4w9WgXcQ",
     "http://www.youtube.com/watch/dQw4w9WgXcQ",
     "http://www.youtube.com/v/dQw4w9WgXcQ",
-    "http://www.youtube.com/v/i_GFalTRHDA",
-    "http://www.youtube.com/watch?v=i-GFalTRHDA&feature=related",
-    "http://www.youtube.com/attribution_link?u=/watch?v=dQw4w9WgXcQ&feature=share&a=9QlmP1yvjcllp0h3l0NwuA",
-    "http://www.youtube.com/attribution_link?a=dQw4w9WgXcQ&u=/watch?v=xvFZjo5PgG0&feature=em-uploademail",
-    "http://www.youtube.com/attribution_link?a=dQw4w9WgXcQ&feature=em-uploademail&u=/watch?v=xvFZjo5PgG0",
+    "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
 ]
 
 INVALID_VIDEO_URLS: list[str] = [
@@ -97,7 +95,17 @@ INVALID_PLAYLIST_URLS: list[str] = [
 
 @pytest.mark.parametrize(
     "video_url",
-    VALID_VIDEO_URLS,
+    [
+        *VALID_VIDEO_URLS,
+        "https://www.youtube.com/watch?v=d_w4w9WgX-Q",
+        "www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+        "https://youtube-nocookie.com/embed/dQw4w9WgXcQ",
+        "youtube-nocookie.com/embed/dQw4w9WgXcQ",
+        "http://www.youtube.com/watch?v=i-GFalTRHDA&feature=related",
+        "http://www.youtube.com/attribution_link?u=/watch?v=dQw4w9WgXcQ&feature=share&a=9QlmP1yvjcllp0h3l0NwuA",
+        "http://www.youtube.com/attribution_link?a=dQw4w9WgXcQ&u=/watch?v=xvFZjo5PgG0&feature=em-uploademail",
+        "http://www.youtube.com/attribution_link?a=dQw4w9WgXcQ&feature=em-uploademail&u=/watch?v=xvFZjo5PgG0",
+    ],
 )
 def test_youtube_video_url_pattern_valid_urls(video_url: str) -> None:
     assert _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(video_url) is not None
@@ -228,16 +236,38 @@ def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
     assert PlaylistDownloader.create_window.__override__
 
 
-@pytest.mark.skip(reason="Test not written")
-def test_get_downloader_for_video() -> None:
-    ...
+@pytest.mark.parametrize(
+    "video_url",
+    VALID_VIDEO_URLS,
+)
+def test_get_downloader_for_video(video_url: str) -> None:
+    downloader: PlaylistDownloader | VideoDownloader = get_downloader(video_url)
+    assert isinstance(downloader, YouTubeDownloader)
+    assert (
+        downloader.url == video_url
+        if video_url.startswith("https://")
+        else f"https://{video_url}"
+    )
 
 
-@pytest.mark.skip(reason="Test not written")
-def test_get_downloader_for_playlist() -> None:
-    ...
+@pytest.mark.parametrize(
+    "playlist_url",
+    VALID_PLAYLIST_URLS,
+)
+def test_get_downloader_for_playlist(playlist_url: str) -> None:
+    downloader: PlaylistDownloader | VideoDownloader = get_downloader(playlist_url)
+    assert isinstance(downloader, PlaylistDownloader)
+    assert (
+        downloader.url == playlist_url
+        if playlist_url.startswith("https://")
+        else f"https://{playlist_url}"
+    )
 
 
-@pytest.mark.skip(reason="Test not written")
-def test_get_downloader_invalid_url_regex_error() -> None:
-    ...
+@pytest.mark.parametrize(
+    "invalid_url",
+    [*INVALID_PLAYLIST_URLS, *INVALID_VIDEO_URLS],
+)
+def test_get_downloader_invalid_url_regex_error(invalid_url: str) -> None:
+    with pytest.raises(pytube.exceptions.RegexMatchError):
+        get_downloader(invalid_url)

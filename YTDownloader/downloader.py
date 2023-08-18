@@ -35,8 +35,9 @@ _YOUTUBE_PLAYLIST_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"\/playlist\?list=[\w\-_]{34}$",
 )
 _YOUTUBE_VIDEO_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?"
-    r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-_]{11}"
+    r"^(?:https?:\/\/)?(?:www\.|m\.)?"
+    r"(?:youtube(?:-nocookie)?\.com|youtu.be)"
+    r"\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)[\w\-\_]{11}"
     r"(?:\S+)?(?:\?t=(?:\d+h)?(?:\d+m)?(?:\d+s)?(?:\d+))?$",
 )
 
@@ -73,16 +74,16 @@ def _increment_video_file_name(root: Path | str, file_name: str) -> str:
 def _remove_forbidden_characters_from_file_name(name: str) -> str:
     r"""Remove '"' '\', '/', ':', '*', '?', '<', '>', '|' from a a file name.
 
-    This avoids an OSError while saving or moving a file.
+    This avoids an OSError while saving or moving a file on Windows.
     """
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
 def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     """Return the appropriate YouTube downloader based on the given url."""
-    if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url):
+    if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url) is not None:
         return PlaylistDownloader(url)
-    if _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(url):
+    if _YOUTUBE_VIDEO_URL_PATTERN.fullmatch(url) is not None:
         return VideoDownloader(url)
     raise pytube.exceptions.RegexMatchError(
         get_downloader.__name__,

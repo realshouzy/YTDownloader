@@ -1,6 +1,7 @@
 -r requirements.txt
 bandit
 black
+coverage
 isort
 mypy
 pylint

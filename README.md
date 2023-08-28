@@ -15,7 +15,7 @@
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/realshouzy/YTDownloader/main.svg)](https://results.pre-commit.ci/latest/github/realshouzy/YTDownloader/main)
 [![pylint status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml/badge.svg?branch=main)](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.yaml)
-[![tests status](https://github.com/realshouzy/YTDownloader/actions/workflows/pylint.tests/badge.svg?branch=main)](https://github.com/realshouzy/YTDownloader/actions/workflows/tests.yaml)
+[![tests status](https://github.com/realshouzy/YTDownloader/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/realshouzy/YTDownloader/actions/workflows/tests.yaml)
 [![Releases](https://img.shields.io/github/v/release/realshouzy/YTDownloader?include_prereleases&label=Latest%20Release)](https://github.com/realshouzy/YTDownloader/releases)
 [![semantic-release](https://img.shields.io/badge/%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/realshouzy/YTDownloader/releases)
 [![Downloads](https://img.shields.io/github/downloads/realshouzy/YTDownloader/total)](https://github.com/realshouzy/YTDownloader/releases)

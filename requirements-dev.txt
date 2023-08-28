@@ -1,7 +1,9 @@
 -r requirements.txt
+bandit
 black
 isort
 mypy
 pylint
+pylint-pytest
 pytest
 ruff

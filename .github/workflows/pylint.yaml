@@ -15,15 +15,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install -U pip setuptools wheel
         pip install -r requirements.txt
-        pip install pytest
-        pip install pylint
+        pip install pylint pytest pylint-pytest
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')

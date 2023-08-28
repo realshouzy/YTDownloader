@@ -93,6 +93,7 @@ convention = "pep257"
 
 [tool.pylint]
 disable = ["C0103"]
+load-plugins = "pylint_pytest"
 
 [tool.bandit]
 exclude_dirs = ["tests"]

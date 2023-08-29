@@ -12,7 +12,7 @@ import pytube.exceptions
 from YTDownloader.downloader import get_downloader
 from YTDownloader.error_window import create_error_window
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from YTDownloader.downloader import PlaylistDownloader, VideoDownloader
 
 sg.theme("Darkred1")

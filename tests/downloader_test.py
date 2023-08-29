@@ -20,7 +20,7 @@ from YTDownloader.downloader import (
     get_downloader,
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pathlib import Path
 
 # pylint: disable=C0116, C0301

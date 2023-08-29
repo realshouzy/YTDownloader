@@ -30,6 +30,7 @@ VALID_VIDEO_URLS: list[str] = [
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s",
     "http://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=related",
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s&feature=related",
     "http://youtu.be/dQw4w9WgXcQ",
     "https://youtu.be/dQw4w9WgXcQ?t=85",
     "http://www.youtube.com/embed/watch?feature=player_embedded&v=dQw4w9WgXcQ",
@@ -237,57 +238,33 @@ def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
 # pylint: enable=E1101
 
 
-@pytest.mark.parametrize(
-    "video_url",
-    [
-        "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s",
-        "http://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=related",
-        "http://youtu.be/dQw4w9WgXcQ",
-        "https://youtu.be/dQw4w9WgXcQ?t=85",
-    ],
-)
-def test_get_downloader_for_video(video_url: str) -> None:
-    downloader: PlaylistDownloader | VideoDownloader = get_downloader(video_url)
+def test_get_downloader_for_video() -> None:
+    downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+        "www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s&feature=related",
+    )
     assert isinstance(downloader, YouTubeDownloader)
     assert (
-        downloader.url == video_url
-        if video_url.startswith("https://")
-        else f"https://{video_url}"
+        downloader.url
+        == "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s&feature=related"
     )
 
 
-@pytest.mark.parametrize(
-    "playlist_url",
-    [
-        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
-        "https://youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
-        "https://www.youtube-nocookie.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
-    ],
-)
-def test_get_downloader_for_playlist(playlist_url: str) -> None:
-    downloader: PlaylistDownloader | VideoDownloader = get_downloader(playlist_url)
+def test_get_downloader_for_playlist() -> None:
+    downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+        "www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+    )
     assert isinstance(downloader, PlaylistDownloader)
     assert (
-        downloader.url == playlist_url
-        if playlist_url.startswith("https://")
-        else f"https://{playlist_url}"
+        downloader.url
+        == "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu"
     )
 
 
 @pytest.mark.parametrize(
     "invalid_url",
     [
-        "http://www.youtube.com",
-        "http://www.youtube.com/watch?v=dQw4w9",
-        "https://www.youtube.com/watch?v=",
-        "http://www.youtube.com/watch?v=dQw4w9ture=related",
-        "http://youtu.be/",
-        "http://youtu.be/dQw4w9",
-        "https://www.youtube.com/list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
-        "https://www.youtube.com/playlist=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
-        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4m",
+        *INVALID_VIDEO_URLS,
+        *INVALID_PLAYLIST_URLS,
     ],
 )
 def test_get_downloader_invalid_url_regex_error(invalid_url: str) -> None:

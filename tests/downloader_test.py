@@ -213,8 +213,10 @@ def test_youtube_downloader_is_abc() -> None:
     assert YouTubeDownloader.__base__ == ABC
 
 
+# pylint: disable=E1101
+
+
 def test_youtube_downloader_abstract_methods() -> None:
-    # pylint: disable=E1101
     assert YouTubeDownloader.window.__isabstractmethod__
     assert YouTubeDownloader.download.__isabstractmethod__
     assert YouTubeDownloader.create_window.__isabstractmethod__
@@ -222,23 +224,29 @@ def test_youtube_downloader_abstract_methods() -> None:
 
 def test_video_downloader_inherits_from_youtube_downloader() -> None:
     assert VideoDownloader.__base__ == YouTubeDownloader
-
-    # pylint: disable=E1101
     assert VideoDownloader.download.__override__
     assert VideoDownloader.create_window.__override__
 
 
 def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
     assert PlaylistDownloader.__base__ == YouTubeDownloader
-
-    # pylint: disable=E1101
     assert PlaylistDownloader.download.__override__
     assert PlaylistDownloader.create_window.__override__
 
 
+# pylint: enable=E1101
+
+
 @pytest.mark.parametrize(
     "video_url",
-    VALID_VIDEO_URLS,
+    [
+        "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s",
+        "http://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=related",
+        "http://youtu.be/dQw4w9WgXcQ",
+        "https://youtu.be/dQw4w9WgXcQ?t=85",
+    ],
 )
 def test_get_downloader_for_video(video_url: str) -> None:
     downloader: PlaylistDownloader | VideoDownloader = get_downloader(video_url)
@@ -252,7 +260,11 @@ def test_get_downloader_for_video(video_url: str) -> None:
 
 @pytest.mark.parametrize(
     "playlist_url",
-    VALID_PLAYLIST_URLS,
+    [
+        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+        "https://youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+        "https://www.youtube-nocookie.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+    ],
 )
 def test_get_downloader_for_playlist(playlist_url: str) -> None:
     downloader: PlaylistDownloader | VideoDownloader = get_downloader(playlist_url)
@@ -266,7 +278,17 @@ def test_get_downloader_for_playlist(playlist_url: str) -> None:
 
 @pytest.mark.parametrize(
     "invalid_url",
-    [*INVALID_PLAYLIST_URLS, *INVALID_VIDEO_URLS],
+    [
+        "http://www.youtube.com",
+        "http://www.youtube.com/watch?v=dQw4w9",
+        "https://www.youtube.com/watch?v=",
+        "http://www.youtube.com/watch?v=dQw4w9ture=related",
+        "http://youtu.be/",
+        "http://youtu.be/dQw4w9",
+        "https://www.youtube.com/list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+        "https://www.youtube.com/playlist=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4m",
+    ],
 )
 def test_get_downloader_invalid_url_regex_error(invalid_url: str) -> None:
     with pytest.raises(pytube.exceptions.RegexMatchError):

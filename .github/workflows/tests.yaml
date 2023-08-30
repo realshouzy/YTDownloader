@@ -27,5 +27,5 @@ jobs:
     - name: Test the code with pytest and coverage
       run: |
         coverage erase
-        coverage run -m pytest -vv
+        coverage run --branch -m pytest -vv
         coverage report -m

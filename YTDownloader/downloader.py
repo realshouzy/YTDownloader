@@ -22,7 +22,7 @@ from typing_extensions import override
 
 from YTDownloader.download_options import AUDIO, HD, LD
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from pytube import Stream

@@ -23,9 +23,9 @@ jobs:
       run: |
         python -m pip install -U pip setuptools wheel
         pip install -r requirements.txt
-        pip install pytest coverage
+        pip install pytest coverage covdefaults
     - name: Test the code with pytest and coverage
       run: |
         coverage erase
-        coverage run --branch -m pytest -vv
-        coverage report -m
+        coverage run -m pytest -vv
+        coverage report

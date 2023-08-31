@@ -1,28 +1,3 @@
-[project]
-name = "YTDownloader"
-description = "A program to download any YouTube video or playlist"
-license = { text = "MIT" }
-authors = [{ name = "realshouzy" }]
-maintainers = [{name = "realshouzy"}]
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-]
-requires-python = ">=3.8"
-dynamic = ["version", "readme", "dependencies"]
-
-[tool.setuptools.dynamic]
-version = { attr = "auto_file_sorter.__version__" }
-readme = { file = ["README.md"] }
-dependencies = { file = "requirements.txt" }
-
 [tool.black]
 target-version = ["py311", "py310", "py39", "py38"]
 line-length = 88
@@ -103,9 +78,10 @@ exclude_dirs = ["tests"]
 testpaths = ["tests"]
 python_files = ["*_test.py"]
 
+[tool.coverage.run]
+plugins = ["covdefaults"]
+
 [tool.coverage.report]
-exclude_also = [
-    "if TYPE_CHECKING:",
-    "if __name__ == .__main__.:",
-    "except Exception as err:",
-]
+exclude_also = ["except Exception as err:"]
+# tests not finished yet
+fail_under = 50

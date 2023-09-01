@@ -116,6 +116,14 @@ python3 -m YTDownloader
 
 While this project currently lacks tests, I acknowledge the importance of testing for ensuring code quality and reliability is. Initially, due to my limited knowledge when starting the project, I didn't prioritize writing tests. As the project evolved, I didn't care to invest time in writing tests, as I originally intended it to be a smaller-scale project. Recognizing the significance of testing in continuous integration, I have taken the initiative to write tests.
 
+## Contributing
+
+If you are interested in contributing to this project, please find more information [here](/CONTRIBUTING.md).
+
+## License
+
+[MIT](/LICENSE)
+
 ## Credit
 
 This concept is **not** my idea. I was inspired by **[Clear Code]** from this **[Video]**.

@@ -13,7 +13,7 @@
 
 2. Step:
 
-- Press "submit" amd wait for a new window to pop up.
+- Press "submit" and wait for a new window to pop up.
 - This windows has two taps. The first one contains information about the video.
 
  ![video_step2](/assets/Video/step2.png)
@@ -47,7 +47,7 @@
 
 6. Step:
 
-- When the download has finished, a window will pop up to notify you. <br />
+- When the download is completed, a window will pop up to notify you. <br />
 
  ![video_step6](/assets/Video/step6.png)
 
@@ -71,7 +71,7 @@
 
 2. Step:
 
-- Press "submit" amd wait for a new window to pop up (this can take some time, since pytube is not the fastest).
+- Press "submit" and wait for a new window to pop up (this may take a sec, since pytube is not the fastest).
 - This window has two taps. The first one contains information about the playlist.
 
  ![playlist_step2](/assets/Playlist/step2.png)

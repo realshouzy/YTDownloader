@@ -69,7 +69,7 @@ pytest
 To only run a specific test run:
 
 ```bash
-pytest tests -k test_name_of_the_test
+pytest -k test_name_of_the_test
 ```
 
 #### Code linting
@@ -82,6 +82,6 @@ pre-commit run --all-files
 
 </br>
 
-If any questions should arise, feel free to create an [issue](https://github.com/realshouzy/YTDownloader/issues)
+If any questions should arise, feel free to create an [issue](https://github.com/realshouzy/YTDownloader/issues) and ask for assistance.
 
 **Thank you for understanding and your willingness to contribute to this project!**

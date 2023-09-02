@@ -118,7 +118,7 @@ While this project currently lacks tests, I acknowledge the importance of testin
 
 ## Contributing
 
-If you are interested in contributing to this project, please find more information [here](/CONTRIBUTING.md).
+If you are interested in contributing to this project, please refer [here](/CONTRIBUTING.md) for more information .
 
 ## License
 

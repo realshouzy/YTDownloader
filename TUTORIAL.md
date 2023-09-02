@@ -13,7 +13,7 @@
 
 2. Step:
 
-- Press "submit" amd wait for a new window to pop up.
+- Press "submit" and wait for a new window to pop up.
 - This windows has two taps. The first one contains information about the video.
 
  ![video_step2](/assets/Video/step2.png)

@@ -122,7 +122,7 @@ If you are interested in contributing to this project, please refer [here](/CONT
 
 ## License
 
-[MIT](/LICENSE)
+``YTDownloader`` is available under the [MIT license](/LICENSE)
 
 ## Credit
 

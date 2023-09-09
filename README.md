@@ -126,8 +126,7 @@ If you are interested in contributing to this project, please refer [here](/CONT
 
 ## Credit
 
-This concept is **not** my idea. I was inspired by **[Clear Code]** from this **[Video]**.
-I took the liberty to add some features, such as downloading playlists, selecting a download directory and other adjustments and improvements.
-You can find the orignial code [here](https://pastebin.com/gRtcAv5c).
+This concept is **not** my idea. I was inspired by **Clear Code** from [this idea](https://github.com/clear-code-projects/PySimpleGuiUltimate/blob/main/youtube.py).
+I took the liberty to add some features and extend the code base, such as downloading playlists, selecting a download directory and other adjustments and improvements.
 
 The [icon](assets/YTDownloader.ico) can be found [here](https://imgs.search.brave.com/-YtNT5BoWqxmDjwakgEUWH1MDX6wkgY4psWSZt5BzY4/rs:fit:512:512:1/g:ce/aHR0cHM6Ly9jZG4u/aWNvbi1pY29ucy5j/b20vaWNvbnMyLzEz/ODEvUE5HLzUxMi95/b3V0dWJlZGxfOTM1/MjkucG5n).

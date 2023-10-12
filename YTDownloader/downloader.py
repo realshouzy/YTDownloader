@@ -9,6 +9,7 @@ __all__: list[str] = [
 ]
 
 import re
+import sys
 import webbrowser
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
@@ -18,7 +19,11 @@ from typing import TYPE_CHECKING, Any, Final
 import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
-from typing_extensions import override
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
 
 from YTDownloader.download_options import AUDIO, HD, LD
 

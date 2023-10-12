@@ -45,11 +45,3 @@ repos:
     hooks:
       - id: bandit
         args: [-c, pyproject.toml]
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        require_serial: true

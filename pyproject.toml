@@ -1,5 +1,5 @@
 [tool.black]
-target-version = ["py311", "py310", "py39", "py38"]
+target-version = ["py312", "py311", "py310", "py39", "py38"]
 line-length = 88
 
 [tool.isort]
@@ -51,10 +51,8 @@ ignore = [
     "EM102",
     "TRY003",
 ]
-unfixable = []
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 show-fixes = true
-target-version = "py311"
+target-version = "py312"
 line-length = 88
 
 [tool.ruff.extend-per-file-ignores]

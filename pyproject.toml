@@ -50,6 +50,7 @@ ignore = [
     "EM101",
     "EM102",
     "TRY003",
+    "UP036",
 ]
 show-fixes = true
 target-version = "py312"

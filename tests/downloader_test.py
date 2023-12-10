@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 import pytube.exceptions
+from pytube import Playlist, Stream, YouTube
 
+from YTDownloader.download_options import AUDIO, HD, LD
 from YTDownloader.downloader import (
     _YOUTUBE_PLAYLIST_URL_PATTERN,
     _YOUTUBE_VIDEO_URL_PATTERN,
@@ -23,7 +25,9 @@ from YTDownloader.downloader import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-# pylint: disable=C0116, C0301
+    from YTDownloader.download_options import DownloadOptions
+
+# pylint: disable=C0116, C0301, W0621, W0212
 
 VALID_VIDEO_URLS: list[str] = [
     "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -92,6 +96,28 @@ INVALID_PLAYLIST_URLS: list[str] = [
     "www.youtube-nocookie.com/playlist?list=PL5--8gKSku15-C4m",
     "youtube-nocookie.com/playlist?list=PL5--8gKSku15-C4m",
 ]
+
+
+@pytest.fixture(scope="session")
+def youtube_video() -> YouTube:
+    return YouTube("http://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+
+@pytest.fixture(scope="session")
+def youtube_playlist() -> Playlist:
+    return Playlist(
+        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+    )
+
+
+@pytest.fixture(scope="session")
+def video_downloader(youtube_video: YouTube) -> VideoDownloader:
+    return VideoDownloader(youtube_video.watch_url)
+
+
+@pytest.fixture(scope="session")
+def playlist_downloader(youtube_playlist: Playlist) -> PlaylistDownloader:
+    return PlaylistDownloader(youtube_playlist.playlist_url)
 
 
 @pytest.mark.parametrize(
@@ -219,19 +245,19 @@ def test_youtube_downloader_is_abc() -> None:
 
 def test_youtube_downloader_abstract_methods() -> None:
     assert YouTubeDownloader.window.__isabstractmethod__
-    assert YouTubeDownloader.download.__isabstractmethod__
+    assert YouTubeDownloader._download.__isabstractmethod__
     assert YouTubeDownloader.create_window.__isabstractmethod__
 
 
 def test_video_downloader_inherits_from_youtube_downloader() -> None:
     assert VideoDownloader.__base__ == YouTubeDownloader
-    assert VideoDownloader.download.__override__
+    assert VideoDownloader._download.__override__
     assert VideoDownloader.create_window.__override__
 
 
 def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
     assert PlaylistDownloader.__base__ == YouTubeDownloader
-    assert PlaylistDownloader.download.__override__
+    assert PlaylistDownloader._download.__override__
     assert PlaylistDownloader.create_window.__override__
 
 
@@ -270,3 +296,67 @@ def test_get_downloader_for_playlist() -> None:
 def test_get_downloader_invalid_url_regex_error(invalid_url: str) -> None:
     with pytest.raises(pytube.exceptions.RegexMatchError):
         get_downloader(invalid_url)
+
+
+def test_video_downloader_repr(
+    youtube_video: YouTube,
+    video_downloader: VideoDownloader,
+) -> None:
+    assert repr(video_downloader) == f"VideoDownloader(url={youtube_video.watch_url!r})"
+
+
+def test_playlist_downloader_repr(
+    youtube_playlist: Playlist,
+    playlist_downloader: VideoDownloader,
+) -> None:
+    assert (
+        repr(playlist_downloader)
+        == f"PlaylistDownloader(url={youtube_playlist.playlist_url!r})"
+    )
+
+
+def test_video_property_video_downloader(
+    youtube_video: YouTube,
+    video_downloader: VideoDownloader,
+) -> None:
+    assert video_downloader.video == youtube_video
+
+
+@pytest.mark.parametrize(
+    ("download_options", "expected_size"),
+    [
+        pytest.param(HD, "19.3 MB", id="HD"),
+        pytest.param(LD, "8.7 MB", id="LD"),
+        pytest.param(AUDIO, "3.3 MB", id="AUDIO"),
+    ],
+)
+def test_get_video_size_video_downloader(
+    video_downloader: VideoDownloader,
+    download_options: DownloadOptions,
+    expected_size: str,
+) -> None:
+    assert video_downloader._get_video_size(download_options) == expected_size
+
+
+@pytest.mark.parametrize(
+    "download_options",
+    [
+        pytest.param(HD, id="HD"),
+        pytest.param(LD, id="LD"),
+        pytest.param(AUDIO, id="AUDIO"),
+    ],
+)
+def test_stream_selection_video_downloader(
+    video_downloader: VideoDownloader,
+    download_options: DownloadOptions,
+) -> None:
+    stream_selection: Stream = video_downloader._stream_selection
+    assert stream_selection[download_options].resolution == download_options.resolution
+    assert stream_selection[download_options].type == download_options.type
+    assert (
+        stream_selection[download_options].is_progressive
+        is download_options.progressive
+    )
+
+    if download_options.type == "audio":  # specific ABR is only relevant for audio
+        assert stream_selection[download_options].abr == download_options.abr

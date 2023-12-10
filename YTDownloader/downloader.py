@@ -20,12 +20,12 @@ import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
 
-if sys.version_info >= (3, 12):
-    from typing import override
-else:
-    from typing_extensions import override
-
 from YTDownloader.download_options import AUDIO, HD, LD
+
+if sys.version_info >= (3, 12):  # pragma: >=3.12 cover
+    from typing import override
+else:  # pragma: <3.12 cover
+    from typing_extensions import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -129,17 +129,17 @@ class YouTubeDownloader(ABC):
         ).first()
 
     @staticmethod
-    def _download_dir_popup() -> None:
+    def _download_dir_popup() -> None:  # pragma: no cover
         """Create an info pop telling 'Please select a download directory.'."""
         sg.Popup("Please select a download directory", title="Info")
 
     @staticmethod
-    def _resolution_unavailable_popup() -> None:
+    def _resolution_unavailable_popup() -> None:  # pragma: no cover
         """Create an info pop telling 'This resolution is unavailable.'."""
         sg.Popup("This resolution is unavailable.", title="Info")
 
     @abstractmethod
-    def download(self, download_options: DownloadOptions, download_dir: Path) -> None:
+    def _download(self, download_options: DownloadOptions, download_dir: Path) -> None:
         """Download the YouTube content into the given directory."""
 
     @abstractmethod
@@ -265,7 +265,7 @@ class PlaylistDownloader(YouTubeDownloader):
 
     @override
     @property
-    def window(self) -> sg.Window:
+    def window(self) -> sg.Window:  # pragma: no cover
         return self._download_window
 
     @property
@@ -303,7 +303,7 @@ class PlaylistDownloader(YouTubeDownloader):
         return f"{round(sum(stream_sizes) / 1048576, 1)} MB"
 
     @override
-    def create_window(self) -> None:
+    def create_window(self) -> None:  # pragma: no cover
         # download window event loops
         while True:
             event, values = self._download_window.read()
@@ -318,18 +318,18 @@ class PlaylistDownloader(YouTubeDownloader):
                 webbrowser.open(self.playlist.owner_url)
 
             if event == "-HD-":
-                self.download(HD, values["-FOLDER-"])
+                self._download(HD, values["-FOLDER-"])
 
             if event == "-LD-":
-                self.download(LD, values["-FOLDER-"])
+                self._download(LD, values["-FOLDER-"])
 
             if event == "-AUDIOALL-":
-                self.download(AUDIO, values["-FOLDER-"])
+                self._download(AUDIO, values["-FOLDER-"])
 
         self._download_window.close()
 
     @override
-    def download(
+    def _download(
         self,
         download_options: DownloadOptions,
         download_dir: Path,
@@ -360,7 +360,7 @@ class PlaylistDownloader(YouTubeDownloader):
             )
         self._download_complete()
 
-    def _download_complete(self) -> None:
+    def _download_complete(self) -> None:  # pragma: no cover
         """Reset the download progressbar and notifies the user when the download has finished."""
         self._download_window["-DOWNLOADPROGRESS-"].update(0)
         self._download_window["-COMPLETED-"].update("")
@@ -499,7 +499,7 @@ class VideoDownloader(YouTubeDownloader):
 
     @override
     @property
-    def window(self) -> sg.Window:
+    def window(self) -> sg.Window:  # pragma: no cover
         return self._download_window
 
     @property
@@ -514,7 +514,7 @@ class VideoDownloader(YouTubeDownloader):
         return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 
     @override
-    def create_window(self) -> None:
+    def create_window(self) -> None:  # pragma: no cover
         # download window event loop
         while True:
             event, values = self._download_window.read()
@@ -532,22 +532,22 @@ class VideoDownloader(YouTubeDownloader):
                 webbrowser.open(self.video.thumbnail_url)
 
             if event == "-HD-":
-                self.download(HD, values["-FOLDER-"])
+                self._download(HD, values["-FOLDER-"])
 
             if event == "-LD-":
-                self.download(LD, values["-FOLDER-"])
+                self._download(LD, values["-FOLDER-"])
 
             if event == "-AUDIO-":
-                self.download(AUDIO, values["-FOLDER-"])
+                self._download(AUDIO, values["-FOLDER-"])
 
         self._download_window.close()
 
     @override
-    def download(
+    def _download(
         self,
         download_options: DownloadOptions,
         download_dir: Path,
-    ) -> None:
+    ) -> None:  # pragma: no cover
         if not download_dir:
             self._download_dir_popup()
             return
@@ -567,14 +567,23 @@ class VideoDownloader(YouTubeDownloader):
 
     # pylint: disable=W0613
 
-    def _progress_check(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
+    def _progress_check(
+        self,
+        stream: Any,
+        chunk: bytes,
+        bytes_remaining: int,
+    ) -> None:  # pragma: no cover
         """Update the progress bar when progress in the download was made."""
         self._download_window["-DOWNLOADPROGRESS-"].update(
             100 - round(bytes_remaining / stream.filesize * 100),
         )
         self._download_window["-COMPLETED-"].update(r"100% completed")
 
-    def _download_complete(self, stream: Any, file_path: str | None) -> None:
+    def _download_complete(
+        self,
+        stream: Any,
+        file_path: str | None,
+    ) -> None:  # pragma: no cover
         """Reset the progress bar when the video download has finished."""
         self._download_window["-DOWNLOADPROGRESS-"].update(0)
         self._download_window["-COMPLETED-"].update("")

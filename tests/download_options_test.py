@@ -9,19 +9,19 @@ from YTDownloader.download_options import AUDIO, HD, LD
 def test_ld_options() -> None:
     assert LD.resolution == "360p"
     assert LD.type == "video"
-    assert LD.progressive is True
+    assert LD.progressive
     assert LD.abr is None
 
 
 def test_hd_options() -> None:
     assert HD.resolution == "720p"
     assert HD.type == "video"
-    assert HD.progressive is True
+    assert HD.progressive
     assert HD.abr is None
 
 
 def test_audio_options() -> None:
     assert AUDIO.resolution is None
     assert AUDIO.type == "audio"
-    assert AUDIO.progressive is False
+    assert not AUDIO.progressive
     assert AUDIO.abr == "128kbps"

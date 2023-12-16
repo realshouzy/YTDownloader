@@ -305,16 +305,6 @@ def test_video_downloader_repr(
     assert repr(video_downloader) == f"VideoDownloader(url={youtube_video.watch_url!r})"
 
 
-def test_playlist_downloader_repr(
-    youtube_playlist: Playlist,
-    playlist_downloader: VideoDownloader,
-) -> None:
-    assert (
-        repr(playlist_downloader)
-        == f"PlaylistDownloader(url={youtube_playlist.playlist_url!r})"
-    )
-
-
 def test_video_property_video_downloader(
     youtube_video: YouTube,
     video_downloader: VideoDownloader,
@@ -339,6 +329,26 @@ def test_get_video_size_video_downloader(
 
 
 @pytest.mark.parametrize(
+    ("download_options", "expected_size"),
+    [
+        pytest.param(HD, "Unavailable", id="HD"),
+        pytest.param(LD, "0.8 MB", id="LD"),
+        pytest.param(AUDIO, "0.3 MB", id="AUDIO"),
+    ],
+)
+def test_get_video_size_video_downloader_unavailable(
+    download_options: DownloadOptions,
+    expected_size: str,
+) -> None:
+    assert (
+        VideoDownloader("https://www.youtube.com/watch?v=jNQXAC9IVRw")._get_video_size(
+            download_options,
+        )
+        == expected_size
+    )
+
+
+@pytest.mark.parametrize(
     "download_options",
     [
         pytest.param(HD, id="HD"),
@@ -350,13 +360,86 @@ def test_stream_selection_video_downloader(
     video_downloader: VideoDownloader,
     download_options: DownloadOptions,
 ) -> None:
-    stream_selection: Stream = video_downloader._stream_selection
-    assert stream_selection[download_options].resolution == download_options.resolution
-    assert stream_selection[download_options].type == download_options.type
-    assert (
-        stream_selection[download_options].is_progressive
-        is download_options.progressive
-    )
+    stream_selection: Stream = video_downloader._stream_selection[download_options]
+    assert stream_selection.resolution == download_options.resolution
+    assert stream_selection.type == download_options.type
+    assert stream_selection.is_progressive is download_options.progressive
 
     if download_options.type == "audio":  # specific ABR is only relevant for audio
-        assert stream_selection[download_options].abr == download_options.abr
+        assert stream_selection.abr == download_options.abr
+
+
+def test_playlist_downloader_repr(
+    youtube_playlist: Playlist,
+    playlist_downloader: VideoDownloader,
+) -> None:
+    assert (
+        repr(playlist_downloader)
+        == f"PlaylistDownloader(url={youtube_playlist.playlist_url!r})"
+    )
+
+
+def test_playlist_property_playlist_downloader(
+    youtube_playlist: Playlist,
+    playlist_downloader: PlaylistDownloader,
+) -> None:
+    assert playlist_downloader.playlist.videos == youtube_playlist.videos
+
+
+@pytest.mark.parametrize(
+    ("download_options", "expected_size"),
+    [
+        pytest.param(HD, "621.8 MB", id="HD"),
+        pytest.param(LD, "320.3 MB", id="LD"),
+        pytest.param(AUDIO, "198.0 MB", id="AUDIO"),
+    ],
+)
+def test_get_playlist_size_playlist_downloader(
+    playlist_downloader: PlaylistDownloader,
+    download_options: DownloadOptions,
+    expected_size: str,
+) -> None:
+    assert playlist_downloader._get_playlist_size(download_options) == expected_size
+
+
+@pytest.mark.parametrize(
+    "download_options",
+    [
+        pytest.param(HD, id="HD"),
+        pytest.param(LD, id="LD"),
+        pytest.param(AUDIO, id="AUDIO"),
+    ],
+)
+def test_stream_selection_len_playlist_downloader(
+    playlist_downloader: PlaylistDownloader,
+    download_options: DownloadOptions,
+) -> None:
+    stream_selection: list[Stream] = playlist_downloader._stream_selection[  # type: ignore[assignment]
+        download_options
+    ]
+    assert len(stream_selection) == playlist_downloader.playlist.length
+
+
+@pytest.mark.parametrize(
+    "download_options",
+    [
+        pytest.param(HD, id="HD"),
+        pytest.param(LD, id="LD"),
+        pytest.param(AUDIO, id="AUDIO"),
+    ],
+)
+def test_stream_selection_playlist_downloader(
+    playlist_downloader: PlaylistDownloader,
+    download_options: DownloadOptions,
+) -> None:
+    stream_selection: list[Stream] = playlist_downloader._stream_selection[  # type: ignore[assignment]
+        download_options
+    ]
+
+    for stream in stream_selection:
+        assert stream.resolution == download_options.resolution
+        assert stream.type == download_options.type
+        assert stream.is_progressive is download_options.progressive
+
+        if download_options.type == "audio":  # specific ABR is only relevant for audio
+            assert stream.abr == download_options.abr

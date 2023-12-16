@@ -52,6 +52,7 @@ ignore = [
     "TRY003",
     "UP036",
     "SLF001",
+    "PLR2004",
 ]
 show-fixes = true
 target-version = "py312"
@@ -83,6 +84,5 @@ plugins = ["covdefaults"]
 
 [tool.coverage.report]
 exclude_also = ["except Exception as err:"]
-# tests not finished yet
-fail_under = 50
+fail_under = 100
 omit = ["YTDownloader/main.py", "YTDownloader/error_window.py"]

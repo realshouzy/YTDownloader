@@ -292,7 +292,9 @@ class PlaylistDownloader(YouTubeDownloader):
 
     def _get_playlist_size(self, download_options: DownloadOptions) -> str:
         """Return the size of the playlist to the corresponding download option."""
-        if (stream_selections := self._stream_selection[download_options]) is None:
+        if (
+            stream_selections := self._stream_selection[download_options]
+        ) is None:  # pragma: no cover
             return "Unavailable"
 
         with ThreadPoolExecutor() as executor:
@@ -333,7 +335,7 @@ class PlaylistDownloader(YouTubeDownloader):
         self,
         download_options: DownloadOptions,
         download_dir: Path,
-    ) -> None:
+    ) -> None:  # pragma: no cover
         if not download_dir:
             self._download_dir_popup()
             return

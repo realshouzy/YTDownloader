@@ -1,7 +1,7 @@
 """Module containing the class to create a error window."""
 from __future__ import annotations
 
-__all__: list[str] = ["create_error_window"]
+__all__: tuple[str, ...] = ("create_error_window",)
 
 import webbrowser
 

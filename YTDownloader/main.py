@@ -2,7 +2,7 @@
 """Main module."""
 from __future__ import annotations
 
-__all__: list[str] = ["main"]
+__all__: tuple[str, ...] = ("main",)
 
 from typing import TYPE_CHECKING
 

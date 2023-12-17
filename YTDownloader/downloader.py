@@ -1,12 +1,12 @@
 """Module containing all classes to download YouTube content."""
 from __future__ import annotations
 
-__all__: list[str] = [
+__all__: tuple[str, ...] = (
     "YouTubeDownloader",
     "PlaylistDownloader",
     "VideoDownloader",
     "get_downloader",
-]
+)
 
 import re
 import sys

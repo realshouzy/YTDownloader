@@ -1,3 +1,3 @@
 # TODO
 
-- [ ] Finish writing tests (Goal: ``>90%`` coverage)
+- [x] Finish writing tests (Goal: ``>90%`` coverage)

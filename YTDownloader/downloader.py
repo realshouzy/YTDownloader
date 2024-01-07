@@ -130,12 +130,12 @@ class YouTubeDownloader(ABC):
 
     @staticmethod
     def _download_dir_popup() -> None:  # pragma: no cover
-        """Create an info pop telling 'Please select a download directory.'."""
+        """Create an info pop telling 'Please select a download directory."""
         sg.Popup("Please select a download directory", title="Info")
 
     @staticmethod
     def _resolution_unavailable_popup() -> None:  # pragma: no cover
-        """Create an info pop telling 'This resolution is unavailable.'."""
+        """Create an info pop telling 'This resolution is unavailable."""
         sg.Popup("This resolution is unavailable.", title="Info")
 
     @abstractmethod

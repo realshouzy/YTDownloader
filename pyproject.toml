@@ -53,6 +53,7 @@ ignore = [
     "UP036",
     "SLF001",
     "PLR2004",
+    "UP035",
 ]
 show-fixes = true
 target-version = "py312"

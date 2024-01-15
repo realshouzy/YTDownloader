@@ -10,7 +10,7 @@ class DownloadOptions(NamedTuple):
     """Tuple-like class holding the download options."""
 
     resolution: str | None
-    type: str  # noqa: A003
+    type: str
     progressive: bool
     abr: str | None
 

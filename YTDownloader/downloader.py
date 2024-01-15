@@ -25,7 +25,7 @@ from YTDownloader.download_options import AUDIO, HD, LD
 if sys.version_info >= (3, 12):  # pragma: >=3.12 cover
     from typing import override
 else:  # pragma: <3.12 cover
-    from typing_extensions import override
+    from typing import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

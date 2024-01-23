@@ -1,12 +1,11 @@
-"""Module containing all classes to download YouTube content."""
+"""A program to download any YouTube video or playlist."""
 from __future__ import annotations
 
-__all__: tuple[str, ...] = (
-    "YouTubeDownloader",
-    "PlaylistDownloader",
-    "VideoDownloader",
-    "get_downloader",
-)
+__version__: Final[str] = "1.5.1"
+__title__: Final[str] = "YTDownloader"
+__author__: Final[str] = "realshouzy"
+__license__: Final[str] = "MIT"
+__copyright__: Final[str] = "Copyright (c) 2022-present realshouzy"
 
 import re
 import sys
@@ -14,13 +13,11 @@ import webbrowser
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, NamedTuple
 
 import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
-
-from YTDownloader.download_options import AUDIO, HD, LD
 
 if sys.version_info >= (3, 12):  # pragma: >=3.12 cover
     from typing import override
@@ -32,7 +29,35 @@ if TYPE_CHECKING:
 
     from pytube import Stream
 
-    from YTDownloader.download_options import DownloadOptions
+
+class DownloadOptions(NamedTuple):
+    """Tuple-like class holding the download options."""
+
+    resolution: str | None
+    type: str
+    progressive: bool
+    abr: str | None
+
+
+# defining download options
+LD: Final[DownloadOptions] = DownloadOptions(
+    resolution="360p",
+    type="video",
+    progressive=True,
+    abr=None,
+)
+HD: Final[DownloadOptions] = DownloadOptions(
+    resolution="720p",
+    type="video",
+    progressive=True,
+    abr=None,
+)
+AUDIO: Final[DownloadOptions] = DownloadOptions(
+    resolution=None,
+    type="audio",
+    progressive=False,
+    abr="128kbps",
+)
 
 _YOUTUBE_PLAYLIST_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^(?:https?:\/\/)?(?:www\.|m\.)?"
@@ -590,3 +615,113 @@ class VideoDownloader(YouTubeDownloader):
         self._download_window["-DOWNLOADPROGRESS-"].update(0)
         self._download_window["-COMPLETED-"].update("")
         sg.Popup("Downloaded complete")
+
+
+def create_error_window(error_name: str, message: str) -> None:  # pragma: no cover
+    """Create an error window."""
+    error_layout: list[list[sg.Text | sg.Button]] = [
+        [sg.Text(f"{error_name}: {message}")],
+        [sg.Button("Ok", key="-OK-"), sg.Button("Report", key="-REPORT-")],
+    ]
+
+    error_window: sg.Window = sg.Window(
+        "Error",
+        layout=error_layout,
+        modal=True,
+    )
+
+    # error window event loop
+    while True:
+        event, _ = error_window.read()  # type: ignore
+        if event in {sg.WIN_CLOSED, "-OK-"}:
+            break
+        if event == "-REPORT-":
+            webbrowser.open("https://github.com/realshouzy/YTDownloader/issues")
+
+    error_window.close()
+
+
+# pylint: disable=R0912, W0718
+
+
+def main() -> int:  # noqa: C901 # pragma: no cover
+    """Run the program."""
+    exit_code: int = 0
+
+    sg.theme("Darkred1")
+
+    # defining layouts
+    start_layout: list[list[sg.Input | sg.Button]] = [
+        [sg.Input(key="-LINKINPUT-"), sg.Button("Submit")],
+    ]
+    start_window: sg.Window = sg.Window("Youtube Downloader", start_layout)
+
+    # main event loop
+    while True:
+        event, values = start_window.read()
+        if event == sg.WIN_CLOSED:
+            break
+
+        if event == "Submit":
+            try:
+                downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+                    values["-LINKINPUT-"],
+                )
+                downloader.create_window()
+
+            except pytube.exceptions.RegexMatchError as re_err:
+                if not values["-LINKINPUT-"]:
+                    create_error_window(
+                        re_err.__class__.__name__,
+                        "Please provide link.",
+                    )
+                else:
+                    create_error_window(re_err.__class__.__name__, "Invalid link.")
+
+            except pytube.exceptions.VideoPrivate as vp_err:
+                create_error_window(vp_err.__class__.__name__, "Video is privat.")
+
+            except pytube.exceptions.MembersOnly as mo_err:
+                create_error_window(
+                    mo_err.__class__.__name__,
+                    "Video is for members only.",
+                )
+
+            except pytube.exceptions.VideoRegionBlocked as vgb_err:
+                create_error_window(
+                    vgb_err.__class__.__name__,
+                    "Video is block in your region.",
+                )
+
+            except pytube.exceptions.LiveStreamError as ls_err:
+                create_error_window(
+                    ls_err.__class__.__name__,
+                    "This is an active life stream.",
+                )
+
+            except pytube.exceptions.AgeRestrictedError as ar_err:
+                create_error_window(
+                    ar_err.__class__.__name__,
+                    "This video is age restricted.",
+                )
+
+            except pytube.exceptions.VideoUnavailable as vu_err:
+                create_error_window(vu_err.__class__.__name__, "Video Unavailable.")
+
+            except KeyError as key_err:
+                create_error_window(
+                    key_err.__class__.__name__,
+                    "Video or playlist is unreachable or invalid.",
+                )
+
+            except Exception as err:
+                create_error_window(err.__class__.__name__, str(err))
+                exit_code = 1
+                break
+
+    start_window.close()
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

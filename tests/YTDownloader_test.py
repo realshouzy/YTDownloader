@@ -1,4 +1,4 @@
-"""Tests for ``YTDownloader.downloader``."""
+"""Tests for ``YTDownloader``."""
 from __future__ import annotations
 
 import inspect
@@ -9,10 +9,12 @@ import pytest
 import pytube.exceptions
 from pytube import Playlist, Stream, YouTube
 
-from YTDownloader.download_options import AUDIO, HD, LD
-from YTDownloader.downloader import (
+from YTDownloader import (
     _YOUTUBE_PLAYLIST_URL_PATTERN,
     _YOUTUBE_VIDEO_URL_PATTERN,
+    AUDIO,
+    HD,
+    LD,
     PlaylistDownloader,
     VideoDownloader,
     YouTubeDownloader,
@@ -25,9 +27,31 @@ from YTDownloader.downloader import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from YTDownloader.download_options import DownloadOptions
+    from YTDownloader import DownloadOptions
 
 # pylint: disable=C0116, C0301, W0621, W0212
+
+
+def test_ld_options() -> None:
+    assert LD.resolution == "360p"
+    assert LD.type == "video"
+    assert LD.progressive
+    assert LD.abr is None
+
+
+def test_hd_options() -> None:
+    assert HD.resolution == "720p"
+    assert HD.type == "video"
+    assert HD.progressive
+    assert HD.abr is None
+
+
+def test_audio_options() -> None:
+    assert AUDIO.resolution is None
+    assert AUDIO.type == "audio"
+    assert not AUDIO.progressive
+    assert AUDIO.abr == "128kbps"
+
 
 VALID_VIDEO_URLS: list[str] = [
     "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -244,21 +268,21 @@ def test_youtube_downloader_is_abc() -> None:
 
 
 def test_youtube_downloader_abstract_methods() -> None:
-    assert YouTubeDownloader.window.__isabstractmethod__
-    assert YouTubeDownloader._download.__isabstractmethod__
-    assert YouTubeDownloader.create_window.__isabstractmethod__
+    assert YouTubeDownloader.window.__isabstractmethod__  # type: ignore[attr-defined]
+    assert YouTubeDownloader._download.__isabstractmethod__  # type: ignore[attr-defined]
+    assert YouTubeDownloader.create_window.__isabstractmethod__  # type: ignore[attr-defined]
 
 
 def test_video_downloader_inherits_from_youtube_downloader() -> None:
     assert VideoDownloader.__base__ == YouTubeDownloader
-    assert VideoDownloader._download.__override__
-    assert VideoDownloader.create_window.__override__
+    assert VideoDownloader._download.__override__  # type: ignore[attr-defined]
+    assert VideoDownloader.create_window.__override__  # type: ignore[attr-defined]
 
 
 def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
     assert PlaylistDownloader.__base__ == YouTubeDownloader
-    assert PlaylistDownloader._download.__override__
-    assert PlaylistDownloader.create_window.__override__
+    assert PlaylistDownloader._download.__override__  # type: ignore[attr-defined]
+    assert PlaylistDownloader.create_window.__override__  # type: ignore[attr-defined]
 
 
 # pylint: enable=E1101
@@ -442,4 +466,5 @@ def test_stream_selection_playlist_downloader(
         assert stream.is_progressive is download_options.progressive
 
         if download_options.type == "audio":  # specific ABR is only relevant for audio
+            assert stream.abr == download_options.abr
             assert stream.abr == download_options.abr

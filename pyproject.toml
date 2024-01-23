@@ -86,4 +86,3 @@ plugins = ["covdefaults"]
 [tool.coverage.report]
 exclude_also = ["except Exception as err:"]
 fail_under = 100
-omit = ["YTDownloader/main.py", "YTDownloader/error_window.py"]

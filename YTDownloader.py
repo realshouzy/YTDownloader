@@ -1,4 +1,5 @@
 """A program to download any YouTube video or playlist."""
+
 from __future__ import annotations
 
 __version__: Final[str] = "1.5.1"

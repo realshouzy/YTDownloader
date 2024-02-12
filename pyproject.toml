@@ -32,8 +32,8 @@ module = "tests.downloader_test"
 disable_error_code = ["attr-defined"]
 
 [tool.ruff]
-select = ["ALL"]
-ignore = [
+lint.select = ["ALL"]
+lint.ignore = [
     "E501",
     "PLR0912",
     "BLE001",
@@ -59,14 +59,14 @@ show-fixes = true
 target-version = "py312"
 line-length = 88
 
-[tool.ruff.extend-per-file-ignores]
+[tool.ruff.lint.extend-per-file-ignores]
 "./tests/*_test.py" = ["ANN201", "D103", "S101"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["YTDownloader"]
 required-imports = ["from __future__ import annotations"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "pep257"
 
 [tool.pylint]

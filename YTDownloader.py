@@ -375,13 +375,11 @@ class PlaylistDownloader(YouTubeDownloader):
             _remove_forbidden_characters_from_file_name(self.playlist.title),
         )
 
-        download_counter: int = 0
-        for video in streams_selection:
+        for download_counter, video in enumerate(streams_selection, start=1):
             clean_filename: str = (
                 f"{_remove_forbidden_characters_from_file_name(video.title)}.mp4"
             )
             video.download(output_path=str(download_path), filename=clean_filename)
-            download_counter += 1
             self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)
             self._download_window["-COMPLETED-"].update(
                 f"{download_counter} of {self.playlist.length}",

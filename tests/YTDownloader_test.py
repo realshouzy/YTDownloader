@@ -262,7 +262,7 @@ def test_remove_forbidden_characters(file_name: str, expected_file_name: str) ->
 
 def test_youtube_downloader_is_abc() -> None:
     assert inspect.isabstract(YouTubeDownloader)
-    assert YouTubeDownloader.__base__ == ABC
+    assert issubclass(YouTubeDownloader, ABC)
 
 
 # pylint: disable=E1101
@@ -275,13 +275,13 @@ def test_youtube_downloader_abstract_methods() -> None:
 
 
 def test_video_downloader_inherits_from_youtube_downloader() -> None:
-    assert VideoDownloader.__base__ == YouTubeDownloader
+    assert issubclass(VideoDownloader, YouTubeDownloader)
     assert VideoDownloader._download.__override__  # type: ignore[attr-defined]
     assert VideoDownloader.create_window.__override__  # type: ignore[attr-defined]
 
 
 def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
-    assert PlaylistDownloader.__base__ == YouTubeDownloader
+    assert issubclass(PlaylistDownloader, YouTubeDownloader)
     assert PlaylistDownloader._download.__override__  # type: ignore[attr-defined]
     assert PlaylistDownloader.create_window.__override__  # type: ignore[attr-defined]
 

@@ -414,9 +414,9 @@ def test_playlist_property_playlist_downloader(
 @pytest.mark.parametrize(
     ("download_options", "expected_size"),
     [
-        pytest.param(HD, "621.8 MB", id="HD"),
-        pytest.param(LD, "320.3 MB", id="LD"),
-        pytest.param(AUDIO, "198.0 MB", id="AUDIO"),
+        pytest.param(HD, "676.7 MB", id="HD"),
+        pytest.param(LD, "365.0 MB", id="LD"),
+        pytest.param(AUDIO, "221.6 MB", id="AUDIO"),
     ],
 )
 def test_get_playlist_size_playlist_downloader(

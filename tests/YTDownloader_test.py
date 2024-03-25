@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
-from abc import ABC
 from typing import TYPE_CHECKING
 
 import pytest
@@ -131,7 +129,7 @@ def youtube_video() -> YouTube:
 @pytest.fixture(scope="session")
 def youtube_playlist() -> Playlist:
     return Playlist(
-        "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
+        "https://www.youtube.com/playlist?list=PLJ_usHaf3fgOVAHKfe1SeVYYP8QRjqtSx",
     )
 
 
@@ -260,53 +258,27 @@ def test_remove_forbidden_characters(file_name: str, expected_file_name: str) ->
     assert result == expected_file_name
 
 
-def test_youtube_downloader_is_abc() -> None:
-    assert inspect.isabstract(YouTubeDownloader)
-    assert issubclass(YouTubeDownloader, ABC)
-
-
-# pylint: disable=E1101
-
-
-def test_youtube_downloader_abstract_methods() -> None:
-    assert YouTubeDownloader.window.__isabstractmethod__  # type: ignore[attr-defined]
-    assert YouTubeDownloader._download.__isabstractmethod__  # type: ignore[attr-defined]
-    assert YouTubeDownloader.create_window.__isabstractmethod__  # type: ignore[attr-defined]
-
-
-def test_video_downloader_inherits_from_youtube_downloader() -> None:
-    assert issubclass(VideoDownloader, YouTubeDownloader)
-    assert VideoDownloader._download.__override__  # type: ignore[attr-defined]
-    assert VideoDownloader.create_window.__override__  # type: ignore[attr-defined]
-
-
-def test_playlist_downloader_inherits_from_youtube_downloader() -> None:
-    assert issubclass(PlaylistDownloader, YouTubeDownloader)
-    assert PlaylistDownloader._download.__override__  # type: ignore[attr-defined]
-    assert PlaylistDownloader.create_window.__override__  # type: ignore[attr-defined]
-
-
 # pylint: enable=E1101
 
 
 def test_get_downloader_for_video() -> None:
-    downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+    downloader: YouTubeDownloader = get_downloader(
         "www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s&feature=related",
     )
-    assert isinstance(downloader, YouTubeDownloader)
+    assert isinstance(downloader, VideoDownloader)
     assert (
-        downloader.url
+        downloader._url
         == "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s&feature=related"
     )
 
 
 def test_get_downloader_for_playlist() -> None:
-    downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+    downloader: YouTubeDownloader = get_downloader(
         "www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu",
     )
     assert isinstance(downloader, PlaylistDownloader)
     assert (
-        downloader.url
+        downloader._url
         == "https://www.youtube.com/playlist?list=PL5--8gKSku15-C4mBKRpQVcaat4zwe4Gu"
     )
 
@@ -323,18 +295,11 @@ def test_get_downloader_invalid_url_regex_error(invalid_url: str) -> None:
         get_downloader(invalid_url)
 
 
-def test_video_downloader_repr(
-    youtube_video: YouTube,
-    video_downloader: VideoDownloader,
-) -> None:
-    assert repr(video_downloader) == f"VideoDownloader(url={youtube_video.watch_url!r})"
-
-
 def test_video_property_video_downloader(
     youtube_video: YouTube,
     video_downloader: VideoDownloader,
 ) -> None:
-    assert video_downloader.video == youtube_video
+    assert video_downloader._video == youtube_video
 
 
 @pytest.mark.parametrize(
@@ -385,7 +350,10 @@ def test_stream_selection_video_downloader(
     video_downloader: VideoDownloader,
     download_options: DownloadOptions,
 ) -> None:
-    stream_selection: Stream = video_downloader._stream_selection[download_options]
+    stream_selection: Stream | None = video_downloader._stream_selection[
+        download_options
+    ]
+    assert stream_selection is not None
     assert stream_selection.resolution == download_options.resolution
     assert stream_selection.type == download_options.type
     assert stream_selection.is_progressive is download_options.progressive
@@ -394,29 +362,19 @@ def test_stream_selection_video_downloader(
         assert stream_selection.abr == download_options.abr
 
 
-def test_playlist_downloader_repr(
-    youtube_playlist: Playlist,
-    playlist_downloader: VideoDownloader,
-) -> None:
-    assert (
-        repr(playlist_downloader)
-        == f"PlaylistDownloader(url={youtube_playlist.playlist_url!r})"
-    )
-
-
 def test_playlist_property_playlist_downloader(
     youtube_playlist: Playlist,
     playlist_downloader: PlaylistDownloader,
 ) -> None:
-    assert playlist_downloader.playlist.videos == youtube_playlist.videos
+    assert playlist_downloader._playlist.videos == youtube_playlist.videos
 
 
 @pytest.mark.parametrize(
     ("download_options", "expected_size"),
     [
-        pytest.param(HD, "676.7 MB", id="HD"),
-        pytest.param(LD, "365.0 MB", id="LD"),
-        pytest.param(AUDIO, "221.6 MB", id="AUDIO"),
+        pytest.param(HD, "162.9 MB", id="HD"),
+        pytest.param(LD, "104.2 MB", id="LD"),
+        pytest.param(AUDIO, "71.2 MB", id="AUDIO"),
     ],
 )
 def test_get_playlist_size_playlist_downloader(
@@ -442,7 +400,7 @@ def test_stream_selection_len_playlist_downloader(
     stream_selection: list[Stream] = playlist_downloader._stream_selection[  # type: ignore[assignment]
         download_options
     ]
-    assert len(stream_selection) == playlist_downloader.playlist.length
+    assert len(stream_selection) == playlist_downloader._playlist.length
 
 
 @pytest.mark.parametrize(

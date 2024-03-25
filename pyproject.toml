@@ -70,7 +70,7 @@ required-imports = ["from __future__ import annotations"]
 convention = "pep257"
 
 [tool.pylint]
-disable = ["C0103"]
+disable = ["C0103", "R0903"]
 load-plugins = "pylint_pytest"
 
 [tool.bandit]
@@ -85,4 +85,3 @@ plugins = ["covdefaults"]
 
 [tool.coverage.report]
 exclude_also = ["except Exception as err:"]
-fail_under = 100

@@ -48,18 +48,15 @@ The used libraries are:
 
 ```python
 # standard library
-import abc
 import concurrent.futures
 import pathlib
 import re
-import sys
 import typing
 import webbrowser
 
 # third party
 import PySimpleGUI
 import pytube
-import typing_extensions # only for python_version<3.12
 
 # for testing
 import pytest

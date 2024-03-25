@@ -9,21 +9,14 @@ __license__: Final[str] = "MIT"
 __copyright__: Final[str] = "Copyright (c) 2022-present realshouzy"
 
 import re
-import sys
 import webbrowser
-from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, NamedTuple
+from typing import TYPE_CHECKING, Any, Final, NamedTuple, Protocol
 
 import PySimpleGUI as sg
 import pytube.exceptions
 from pytube import Playlist, YouTube
-
-if sys.version_info >= (3, 12):  # pragma: >=3.12 cover
-    from typing import override
-else:  # pragma: <3.12 cover
-    from typing_extensions import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -110,7 +103,7 @@ def _remove_forbidden_characters_from_file_name(name: str) -> str:
     return "".join(char for char in name if char not in r'"\/:*?<>|')
 
 
-def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
+def get_downloader(url: str) -> YouTubeDownloader:
     """Return the appropriate YouTube downloader based on the given url."""
     if _YOUTUBE_PLAYLIST_URL_PATTERN.fullmatch(url) is not None:
         return PlaylistDownloader(url)
@@ -122,58 +115,37 @@ def get_downloader(url: str) -> PlaylistDownloader | VideoDownloader:
     )
 
 
-class YouTubeDownloader(ABC):
-    """YouTubeDownloader is the abstract base class for downloading YouTube content."""
+def _get_stream_from_video(
+    video: YouTube,
+    download_options: DownloadOptions,
+) -> Stream | None:
+    """Return a stream filtered according to the download options."""
+    return video.streams.filter(
+        resolution=download_options.resolution,
+        type=download_options.type,
+        progressive=download_options.progressive,
+        abr=download_options.abr,
+    ).first()
 
-    def __init__(self, url: str) -> None:
-        self._url: str = url if url.startswith("https://") else f"https://{url}"
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(url={self.url!r})"
+def _download_dir_popup() -> None:  # pragma: no cover
+    """Create an info pop telling 'Please select a download directory."""
+    sg.Popup("Please select a download directory", title="Info")
 
-    @property
-    def url(self) -> str:
-        """The YouTube URL."""
-        return self._url
 
-    @property
-    @abstractmethod
-    def window(self) -> sg.Window:
-        """The GUI window."""
+def _resolution_unavailable_popup() -> None:  # pragma: no cover
+    """Create an info pop telling 'This resolution is unavailable."""
+    sg.Popup("This resolution is unavailable.", title="Info")
 
-    @staticmethod
-    def _get_stream_from_video(
-        video: YouTube,
-        download_options: DownloadOptions,
-    ) -> Stream | None:
-        """Return a stream filtered according to the download options."""
-        return video.streams.filter(
-            resolution=download_options.resolution,
-            type=download_options.type,
-            progressive=download_options.progressive,
-            abr=download_options.abr,
-        ).first()
 
-    @staticmethod
-    def _download_dir_popup() -> None:  # pragma: no cover
-        """Create an info pop telling 'Please select a download directory."""
-        sg.Popup("Please select a download directory", title="Info")
+class YouTubeDownloader(Protocol):
+    """GUI application for downloading YouTube content."""
 
-    @staticmethod
-    def _resolution_unavailable_popup() -> None:  # pragma: no cover
-        """Create an info pop telling 'This resolution is unavailable."""
-        sg.Popup("This resolution is unavailable.", title="Info")
-
-    @abstractmethod
-    def _download(self, download_options: DownloadOptions, download_dir: Path) -> None:
-        """Download the YouTube content into the given directory."""
-
-    @abstractmethod
     def create_window(self) -> None:
         """Create the event loop for the download window."""
 
 
-class PlaylistDownloader(YouTubeDownloader):
+class PlaylistDownloader:
     """Class handling the download of a YouTube playlist.
 
     It inherits from ``YouTubeDownloader``
@@ -181,8 +153,8 @@ class PlaylistDownloader(YouTubeDownloader):
     """
 
     def __init__(self, url: str) -> None:
-        super().__init__(url)
-        self._playlist: Playlist = Playlist(self.url)
+        self._url: str = url if url.startswith("https://") else f"https://{url}"
+        self._playlist: Playlist = Playlist(self._url)
 
         # binding the playlists (list of streams) to corresponding download option
         hd_list: list[Stream | None] = self._get_playlist(HD)
@@ -196,18 +168,23 @@ class PlaylistDownloader(YouTubeDownloader):
 
         # defining layouts
         info_tab: list[list[sg.Text]] = [
-            [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
-            [sg.Text("Title:"), sg.Text(self.playlist.title)],
-            [sg.Text("Videos:"), sg.Text(self.playlist.length)],
-            [sg.Text("Views:"), sg.Text(f"{self.playlist.views:,}")],
+            [sg.Text("URL:"), sg.Text(self._url, enable_events=True, key="-URL-")],
+            [sg.Text("Title:"), sg.Text(self._playlist.title)],
+            [sg.Text("Videos:"), sg.Text(self._playlist.length)],
+            [sg.Text("Views:"), sg.Text(f"{self._playlist.views:,}")],
             [
                 sg.Text("Owner:"),
-                sg.Text(self.playlist.owner, enable_events=True, key="-OWNER-"),
+                sg.Text(self._playlist.owner, enable_events=True, key="-OWNER-"),
             ],
-            [sg.Text("Last updated:"), sg.Text(self.playlist.last_updated)],
+            [sg.Text("Last updated:"), sg.Text(self._playlist.last_updated)],
         ]
 
-        download_all_tab: list[list[sg.Text | sg.Input | sg.Frame]] = [
+        download_all_tab: list[
+            list[sg.Text | sg.Input | sg.Button]
+            | list[sg.Frame]
+            | list[sg.Text | sg.Input | sg.Frame]
+            | list[sg.ProgressBar]
+        ] = [
             [
                 sg.Text("Download Folder"),
                 sg.Input(size=(53, 1), enable_events=True, key="-FOLDER-"),
@@ -260,7 +237,7 @@ class PlaylistDownloader(YouTubeDownloader):
             ],
             [
                 sg.ProgressBar(
-                    self.playlist.length,
+                    self._playlist.length,
                     orientation="h",
                     size=(20, 20),
                     key="-DOWNLOADPROGRESS-",
@@ -289,16 +266,6 @@ class PlaylistDownloader(YouTubeDownloader):
             modal=True,
         )
 
-    @override
-    @property
-    def window(self) -> sg.Window:  # pragma: no cover
-        return self._download_window
-
-    @property
-    def playlist(self) -> Playlist:
-        """Return the YouTube playlist."""
-        return self._playlist
-
     def _get_playlist(
         self,
         download_options: DownloadOptions,
@@ -307,11 +274,11 @@ class PlaylistDownloader(YouTubeDownloader):
         with ThreadPoolExecutor() as executor:
             stream_list: list[Stream | None] = list(
                 executor.map(
-                    lambda stream: self._get_stream_from_video(
+                    lambda stream: _get_stream_from_video(
                         stream,
                         download_options,
                     ),
-                    self.playlist.videos,
+                    self._playlist.videos,
                 ),
             )
         return stream_list
@@ -330,8 +297,8 @@ class PlaylistDownloader(YouTubeDownloader):
             )
         return f"{round(sum(stream_sizes) / 1048576, 1)} MB"
 
-    @override
     def create_window(self) -> None:  # pragma: no cover
+        """Create the event loop for the download window."""
         # download window event loops
         while True:
             event, values = self._download_window.read()
@@ -340,10 +307,10 @@ class PlaylistDownloader(YouTubeDownloader):
                 break
 
             if event == "-URL-":
-                webbrowser.open(self.url)
+                webbrowser.open(self._url)
 
             if event == "-OWNER-":
-                webbrowser.open(self.playlist.owner_url)
+                webbrowser.open(self._playlist.owner_url)
 
             if event == "-HD-":
                 self._download(HD, values["-FOLDER-"])
@@ -356,23 +323,23 @@ class PlaylistDownloader(YouTubeDownloader):
 
         self._download_window.close()
 
-    @override
     def _download(
         self,
         download_options: DownloadOptions,
         download_dir: Path,
     ) -> None:  # pragma: no cover
+        """Download the YouTube content into the given directory."""
         if not download_dir:
-            self._download_dir_popup()
+            _download_dir_popup()
             return
 
         if (streams_selection := self._stream_selection[download_options]) is None:
-            self._resolution_unavailable_popup()
+            _resolution_unavailable_popup()
             return
 
         download_path: Path = _increment_playlist_dir_name(
             download_dir,
-            _remove_forbidden_characters_from_file_name(self.playlist.title),
+            _remove_forbidden_characters_from_file_name(self._playlist.title),
         )
 
         for download_counter, video in enumerate(streams_selection, start=1):
@@ -382,7 +349,7 @@ class PlaylistDownloader(YouTubeDownloader):
             video.download(output_path=str(download_path), filename=clean_filename)
             self._download_window["-DOWNLOADPROGRESS-"].update(download_counter)
             self._download_window["-COMPLETED-"].update(
-                f"{download_counter} of {self.playlist.length}",
+                f"{download_counter} of {self._playlist.length}",
             )
         self._download_complete()
 
@@ -393,7 +360,7 @@ class PlaylistDownloader(YouTubeDownloader):
         sg.Popup("Download completed")
 
 
-class VideoDownloader(YouTubeDownloader):
+class VideoDownloader:
     """Class handling the download of a YouTube video.
 
     It inherits from ``YouTubeDownloader``
@@ -401,41 +368,41 @@ class VideoDownloader(YouTubeDownloader):
     """
 
     def __init__(self, url: str) -> None:
-        super().__init__(url)
+        self._url: str = url if url.startswith("https://") else f"https://{url}"
         self._video: YouTube = YouTube(
-            self.url,
+            self._url,
             on_progress_callback=self._progress_check,
             on_complete_callback=self._download_complete,
         )
 
         # binding videos to corresponding download option
         self._stream_selection: dict[DownloadOptions, Stream | None] = {
-            HD: self._get_stream_from_video(self.video, HD),
-            LD: self._get_stream_from_video(self.video, LD),
-            AUDIO: self._get_stream_from_video(self.video, AUDIO),
+            HD: _get_stream_from_video(self._video, HD),
+            LD: _get_stream_from_video(self._video, LD),
+            AUDIO: _get_stream_from_video(self._video, AUDIO),
         }
 
         # defining layouts
         info_tab: list[list[sg.Text | sg.Multiline]] = [
-            [sg.Text("URL:"), sg.Text(self.url, enable_events=True, key="-URL-")],
-            [sg.Text("Title:"), sg.Text(self.video.title)],
+            [sg.Text("URL:"), sg.Text(self._url, enable_events=True, key="-URL-")],
+            [sg.Text("Title:"), sg.Text(self._video.title)],
             [
                 sg.Text("Length:"),
-                sg.Text(f"{round(self.video.length / 60,2)} minutes"),
+                sg.Text(f"{round(self._video.length / 60,2)} minutes"),
             ],
-            [sg.Text("Views:"), sg.Text(f"{self.video.views:,}")],
+            [sg.Text("Views:"), sg.Text(f"{self._video.views:,}")],
             [
                 sg.Text("Creator:"),
-                sg.Text(self.video.author, enable_events=True, key="-CREATOR-"),
+                sg.Text(self._video.author, enable_events=True, key="-CREATOR-"),
             ],
             [
                 sg.Text("Thumbnail:"),
-                sg.Text(self.video.thumbnail_url, enable_events=True, key="-THUMB-"),
+                sg.Text(self._video.thumbnail_url, enable_events=True, key="-THUMB-"),
             ],
             [
                 sg.Text("Description:"),
                 sg.Multiline(
-                    self.video.description,
+                    self._video.description,
                     size=(40, 20),
                     no_scrollbar=True,
                     disabled=True,
@@ -444,8 +411,7 @@ class VideoDownloader(YouTubeDownloader):
         ]
 
         download_tab: list[
-            list[sg.Text | sg.Input | sg.Button]
-            | list[sg.Text | sg.Input | sg.Frame | sg.ProgressBar]
+            list[sg.Text | sg.Input | sg.Button] | list[sg.Frame] | list[sg.ProgressBar]
         ] = [
             [
                 sg.Text("Download Folder"),
@@ -523,24 +489,14 @@ class VideoDownloader(YouTubeDownloader):
             modal=True,
         )
 
-    @override
-    @property
-    def window(self) -> sg.Window:  # pragma: no cover
-        return self._download_window
-
-    @property
-    def video(self) -> YouTube:
-        """Return the YouTube video."""
-        return self._video
-
     def _get_video_size(self, download_options: DownloadOptions) -> str:
         """Return the size of the video to the corresponding download option."""
         if (stream_selection := self._stream_selection[download_options]) is None:
             return "Unavailable"
         return f"{round(stream_selection.filesize / 1048576, 1)} MB"
 
-    @override
     def create_window(self) -> None:  # pragma: no cover
+        """Create the event loop for the download window."""
         # download window event loop
         while True:
             event, values = self._download_window.read()
@@ -549,13 +505,13 @@ class VideoDownloader(YouTubeDownloader):
                 break
 
             if event == "-URL-":
-                webbrowser.open(self.url)
+                webbrowser.open(self._url)
 
             if event == "-CREATOR-":
-                webbrowser.open(self.video.channel_url)
+                webbrowser.open(self._video.channel_url)
 
             if event == "-THUMB-":
-                webbrowser.open(self.video.thumbnail_url)
+                webbrowser.open(self._video.thumbnail_url)
 
             if event == "-HD-":
                 self._download(HD, values["-FOLDER-"])
@@ -568,22 +524,22 @@ class VideoDownloader(YouTubeDownloader):
 
         self._download_window.close()
 
-    @override
     def _download(
         self,
         download_options: DownloadOptions,
         download_dir: Path,
     ) -> None:  # pragma: no cover
+        """Download the YouTube content into the given directory."""
         if not download_dir:
-            self._download_dir_popup()
+            _download_dir_popup()
             return
 
         if (stream_selection := self._stream_selection[download_options]) is None:
-            self._resolution_unavailable_popup()
+            _resolution_unavailable_popup()
             return
 
         clean_video_title: str = _remove_forbidden_characters_from_file_name(
-            self.video.title,
+            self._video.title,
         )
         file_path: str = (
             f"{_increment_video_file_name(download_dir, clean_video_title)}.mp4"
@@ -663,7 +619,7 @@ def main() -> int:  # noqa: C901 # pragma: no cover
 
         if event == "Submit":
             try:
-                downloader: PlaylistDownloader | VideoDownloader = get_downloader(
+                downloader: YouTubeDownloader = get_downloader(
                     values["-LINKINPUT-"],
                 )
                 downloader.create_window()

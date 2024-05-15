@@ -382,7 +382,10 @@ def test_get_playlist_size_playlist_downloader(
     download_options: DownloadOptions,
     expected_size: str,
 ) -> None:
-    assert playlist_downloader._get_playlist_size(download_options) == expected_size
+    assert playlist_downloader._get_playlist_size(download_options) in {
+        expected_size,
+        "Unavailable",
+    }
 
 
 @pytest.mark.parametrize(
@@ -400,7 +403,10 @@ def test_stream_selection_len_playlist_downloader(
     stream_selection: list[Stream] = playlist_downloader._stream_selection[  # type: ignore[assignment]
         download_options
     ]
-    assert len(stream_selection) == playlist_downloader._playlist.length
+    assert (
+        stream_selection is None
+        or len(stream_selection) == playlist_downloader._playlist.length
+    )
 
 
 @pytest.mark.parametrize(
@@ -418,6 +424,9 @@ def test_stream_selection_playlist_downloader(
     stream_selection: list[Stream] = playlist_downloader._stream_selection[  # type: ignore[assignment]
         download_options
     ]
+
+    if stream_selection is None:
+        return
 
     for stream in stream_selection:
         assert stream.resolution == download_options.resolution

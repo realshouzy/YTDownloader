@@ -23,7 +23,7 @@ git clone https://github.com/realshouzy/YTDownloader.git && cd YTDownloader
 It is highly recommended to utilize a virtual environment to develop on this project. The easiest way to set up a virtual environment is by using tox:
 
 ```bash
-tox --devenv venv
+tox devenv venv
 ```
 
 Otherwise you could also use [``virtualenv``](https://virtualenv.pypa.io/en/latest) or [``venv``](https://docs.python.org/3/library/venv.html).

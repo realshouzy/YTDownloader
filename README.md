@@ -42,7 +42,7 @@ A tutorial on how to the application works can be found [here](/TUTORIAL.md).
 
 ### Requirements
 
-Make sure you have Python 3.8 or higher installed.
+Make sure you have Python 3.8 or higher installed. Note that `pypy` is not officially supported, however it can work with `pypy` on Windows.
 
 The used libraries are:
 

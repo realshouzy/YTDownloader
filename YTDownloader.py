@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__version__: Final[str] = "1.5.1"
+__version__: Final[str] = "1.5.4"
 __title__: Final[str] = "YTDownloader"
 __author__: Final[str] = "realshouzy"
 __license__: Final[str] = "MIT"

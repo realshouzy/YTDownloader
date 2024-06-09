@@ -6,6 +6,7 @@ coverage
 isort
 mypy
 pre-commit
+pyinstaller
 pylint
 pylint-pytest
 pytest

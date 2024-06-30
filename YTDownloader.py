@@ -111,7 +111,7 @@ def get_downloader(url: str) -> YouTubeDownloader:
         return VideoDownloader(url)
     raise pytube.exceptions.RegexMatchError(
         get_downloader.__name__,
-        "_YOUTUBE_PLAYLIST_URL_PATTERN | _YOUTUBE_VIDEO_URL_PATTERN",
+        f"({_YOUTUBE_PLAYLIST_URL_PATTERN.pattern}) | ({_YOUTUBE_VIDEO_URL_PATTERN.pattern})",
     )
 
 

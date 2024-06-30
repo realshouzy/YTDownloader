@@ -599,7 +599,7 @@ def create_error_window(error_name: str, message: str) -> None:  # pragma: no co
 # pylint: disable=R0912, W0718
 
 
-def main() -> int:  # noqa: C901 # pragma: no cover
+def main() -> int:  # pragma: no cover
     """Run the program."""
     exit_code: int = 0
 
@@ -633,35 +633,11 @@ def main() -> int:  # noqa: C901 # pragma: no cover
                 else:
                     create_error_window(re_err.__class__.__name__, "Invalid link.")
 
-            except pytube.exceptions.VideoPrivate as vp_err:
-                create_error_window(vp_err.__class__.__name__, "Video is privat.")
-
-            except pytube.exceptions.MembersOnly as mo_err:
-                create_error_window(
-                    mo_err.__class__.__name__,
-                    "Video is for members only.",
-                )
-
-            except pytube.exceptions.VideoRegionBlocked as vgb_err:
-                create_error_window(
-                    vgb_err.__class__.__name__,
-                    "Video is block in your region.",
-                )
-
-            except pytube.exceptions.LiveStreamError as ls_err:
-                create_error_window(
-                    ls_err.__class__.__name__,
-                    "This is an active life stream.",
-                )
-
-            except pytube.exceptions.AgeRestrictedError as ar_err:
-                create_error_window(
-                    ar_err.__class__.__name__,
-                    "This video is age restricted.",
-                )
-
             except pytube.exceptions.VideoUnavailable as vu_err:
-                create_error_window(vu_err.__class__.__name__, "Video Unavailable.")
+                create_error_window(vu_err.__class__.__name__, vu_err.error_string)
+
+            except pytube.exceptions.PytubeError as pytube_err:
+                create_error_window(pytube_err.__class__.__name__, str(pytube_err))
 
             except KeyError as key_err:
                 create_error_window(

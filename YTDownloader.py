@@ -69,8 +69,7 @@ _YOUTUBE_VIDEO_URL_PATTERN: Final[re.Pattern[str]] = re.compile(
 # defining helper functions
 def _increment_playlist_dir_name(root: Path | str, sub: Path | str) -> Path:
     """Increment the directory if the user downloads a playlist more than once."""
-    original_path: Path = Path(f"{root}/{sub}")
-    if not original_path.exists():
+    if not (original_path := Path(f"{root}/{sub}")).exists():
         return original_path
 
     i: int = 1
@@ -83,8 +82,7 @@ def _increment_playlist_dir_name(root: Path | str, sub: Path | str) -> Path:
 
 def _increment_video_file_name(root: Path | str, file_name: str) -> str:
     """Increment the file if the user downloads a video more than once."""
-    file_path: Path = Path(f"{root}/{file_name}.mp4")
-    if not file_path.exists():
+    if not Path(f"{root}/{file_name}.mp4").exists():
         return file_name
 
     i: int = 1
